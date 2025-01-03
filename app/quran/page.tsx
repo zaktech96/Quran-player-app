@@ -4,18 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { getAllSurahs, getSurah } from "@/lib/quran"
-import { Surah, Ayah } from "@/types/quran"
+import { Surah, Ayah, Reciter } from "@/types/quran"
 import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
-
-type Reciter = {
-  id: string;
-  name: string;
-  arabicName: string;
-  format: string;
-  type: string;
-  direction: string;
-};
 
 export default function QuranPlayer() {
   const [surahs, setSurahs] = useState<Surah[]>([])
@@ -358,7 +349,6 @@ export default function QuranPlayer() {
                               >
                                 {displayText}
                               </div>
-                              
                               {/* Translation */}
                               <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
                                 {ayah.translation}

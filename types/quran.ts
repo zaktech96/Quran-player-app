@@ -1,39 +1,22 @@
-export interface Surah {
-  number: number
-  name: string
-  englishName: string
-  englishNameTranslation: string
-  numberOfAyahs: number
-  revelationType: string
-  edition?: QuranEdition
+export type Surah = {
+  number: number;
+  name: string;
+  englishName: string;
+  englishNameTranslation: string;
+  numberOfAyahs: number;
+  revelationType: string;
 }
 
-export interface Ayah {
-  number: number
-  numberInSurah: number
-  text: string
-  translation: string
-  audio: string
-  edition?: QuranEdition
-  translationEdition?: QuranEdition
+export type Ayah = {
+  number: number;
+  text: string;
+  numberInSurah: number;
+  translation: string;
 }
 
-export interface QuranAudio {
-  url: string
-  duration: number
-  reciter: string
-}
-
-export interface QuranEdition {
-  identifier: string
-  language: string
-  name: string
-  englishName: string
-  format: "text" | "audio"
-  type: "quran" | "translation" | "transliteration" | "tafsir"
-  direction: "rtl" | "ltr" | null
-}
-
-export type EditionType = "quran" | "translation" | "transliteration" | "tafsir"
-export type EditionFormat = "text" | "audio"
-export type EditionDirection = "rtl" | "ltr" 
+export type Reciter = {
+  id: string;
+  name: string;
+  arabicName: string;
+  format: string;
+} 

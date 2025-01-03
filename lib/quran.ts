@@ -1,6 +1,6 @@
 import { Surah, Ayah, QuranEdition } from "@/types/quran"
 
-const API_BASE_URL = "http://api.alquran.cloud/v1"
+const API_BASE_URL = "https://api.alquran.cloud/v1"
 
 // Available edition types
 export const EDITION_TYPES = {
