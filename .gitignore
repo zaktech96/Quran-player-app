@@ -12,6 +12,9 @@
 /.next/
 /out/
 
+# Documentation
+project-overview.md
+
 # production
 /build
 
