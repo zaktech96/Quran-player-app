@@ -209,30 +209,7 @@ export default function QuranPlayer() {
                     </div>
                   </div>
 
-                  {/* Add View Toggle Switch */}
-                  <div className="flex items-center justify-end space-x-3 mb-6">
-                    <Switch
-                      checked={showFullSurah}
-                      onCheckedChange={setShowFullSurah}
-                      id="view-mode"
-                      className="data-[state=checked]:bg-primary"
-                    />
-                    <label
-                      htmlFor="view-mode"
-                      className="text-sm font-medium cursor-pointer"
-                    >
-                      Show Full Surah
-                    </label>
-                  </div>
-
                   <div className="space-y-8">
-                    {/* Show Bismillah only for surahs other than Al-Fatiha and At-Tawbah */}
-                    {currentSurah?.number !== 1 && currentSurah?.number !== 9 && (
-                      <div className="text-4xl text-center font-arabic leading-loose p-8 bg-primary/5 rounded-xl mb-8">
-                        بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                      </div>
-                    )}
-
                     {showFullSurah ? (
                       <div className="space-y-12">
                         {currentAyahs.map((ayah, index) => (
