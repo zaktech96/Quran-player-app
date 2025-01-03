@@ -93,6 +93,101 @@ export function LandingPage() {
           </div>
         </section>
 
+        {/* App Showcase Hero Section */}
+        <section className="py-24 bg-gradient-to-b from-green-50/50 to-white/50 relative overflow-hidden">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Content */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="space-y-6"
+              >
+                <h2 className="text-4xl font-bold text-green-800">
+                  Modern Quran Reading Experience
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-5 h-5 text-green-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg text-green-800 mb-1">Clear Arabic Text</h3>
+                      <p className="text-gray-600">Experience the Quran with beautiful Uthmani script and precise verse markers</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <Headphones className="w-5 h-5 text-green-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg text-green-800 mb-1">Professional Recitations</h3>
+                      <p className="text-gray-600">Listen to beautiful recitations from renowned Qaris with verse-by-verse audio</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <Globe className="w-5 h-5 text-green-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg text-green-800 mb-1">Multiple Translations</h3>
+                      <p className="text-gray-600">Read accurate translations in various languages to understand the meaning</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-4">
+                  <Link href="/quran">
+                    <Button 
+                      size="lg" 
+                      className="bg-green-700 hover:bg-green-800 text-lg px-8 py-6 rounded-full group"
+                    >
+                      Try it Now
+                      <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* App Preview */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="relative"
+              >
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-green-100/20 to-transparent" />
+                  <div className="p-8">
+                    <div className="space-y-6">
+                      {/* Sample Verse Display */}
+                      <div className="text-right font-arabic text-3xl leading-loose text-gray-800 mb-4">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                      </div>
+                      <div className="text-gray-600 text-lg">
+                        In the name of Allah, the Entirely Merciful, the Especially Merciful
+                      </div>
+                      {/* Audio Player Preview */}
+                      <div className="flex items-center justify-center space-x-4 pt-4">
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <ChevronRight className="w-6 h-6 text-green-700" />
+                        </div>
+                        <div className="flex-1 h-2 bg-green-100 rounded-full">
+                          <div className="w-1/3 h-full bg-green-500 rounded-full" />
+                        </div>
+                        <div className="text-sm text-gray-500">1:1</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Decorative Elements */}
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-green-200/30 rounded-full blur-2xl" />
+                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-green-200/30 rounded-full blur-2xl" />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-20 relative">
           <div className="container mx-auto px-4">
