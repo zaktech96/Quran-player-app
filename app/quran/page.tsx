@@ -209,47 +209,61 @@ export default function QuranPlayer() {
                     </div>
                   </div>
 
+                  Display Bismillah
+                  {currentSurah?.number !== 1 && currentSurah?.number !== 9 && (
+                    <div className="text-4xl text-center font-arabic leading-loose p-8 bg-primary/5 rounded-xl mb-4">
+                      بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                    </div>
+                  )} 
                   <div className="space-y-8">
                     {showFullSurah ? (
                       <div className="space-y-12">
-                        {currentAyahs.map((ayah, index) => (
-                          <div key={ayah.number} className="space-y-6">
-                            {/* Ayah Number */}
-                            <div className="flex items-center justify-center space-x-4">
-                              <div className="h-px flex-1 bg-border"></div>
-                              <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
-                                Verse {ayah.numberInSurah} of {currentSurah.numberOfAyahs}
+                        {currentAyahs.map((ayah, index) => {
+                          // Remove Bismillah from the first verse
+                          let ayahText = ayah.text;
+                          if (index === 0 && ayahText.startsWith("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ")) {
+                            ayahText = ayahText.replace("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "").trim();
+                          }
+
+                          return (
+                            <div key={ayah.number} className="space-y-6">
+                              {/* Ayah Number */}
+                              <div className="flex items-center justify-center space-x-4">
+                                <div className="h-px flex-1 bg-border"></div>
+                                <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
+                                  Verse {ayah.numberInSurah} of {currentSurah.numberOfAyahs}
+                                </div>
+                                <div className="h-px flex-1 bg-border"></div>
                               </div>
-                              <div className="h-px flex-1 bg-border"></div>
+
+                              {/* Arabic Text */}
+                              <div 
+                                className={`text-4xl text-right font-arabic leading-loose p-8 rounded-xl cursor-pointer transition-colors duration-200 ${
+                                  currentAyahIndex === index 
+                                  ? 'bg-primary/20 shadow-lg border border-primary/20' 
+                                  : 'bg-primary/5 hover:bg-primary/10 hover:shadow-md'
+                                }`}
+                                dir="rtl"
+                                lang="ar"
+                                onClick={() => {
+                                  setCurrentAyahIndex(index);
+                                  if (audioRef) {
+                                    audioRef.src = ayah.audio;
+                                    audioRef.load();
+                                    setIsPlaying(false);
+                                  }
+                                }}
+                              >
+                                {ayahText}
+                              </div>
+                              
+                              {/* Translation */}
+                              <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
+                                {ayah.translation}
+                              </div>
                             </div>
-                            
-                            {/* Arabic Text */}
-                            <div 
-                              className={`text-4xl text-right font-arabic leading-loose p-8 rounded-xl cursor-pointer transition-colors duration-200 ${
-                                currentAyahIndex === index 
-                                ? 'bg-primary/20 shadow-lg border border-primary/20' 
-                                : 'bg-primary/5 hover:bg-primary/10 hover:shadow-md'
-                              }`}
-                              dir="rtl"
-                              lang="ar"
-                              onClick={() => {
-                                setCurrentAyahIndex(index);
-                                if (audioRef) {
-                                  audioRef.src = ayah.audio;
-                                  audioRef.load();
-                                  setIsPlaying(false);
-                                }
-                              }}
-                            >
-                              {ayah.text}
-                            </div>
-                            
-                            {/* Translation */}
-                            <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
-                              {ayah.translation}
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <div className="space-y-8 mt-8">
