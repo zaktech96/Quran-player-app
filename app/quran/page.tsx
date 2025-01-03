@@ -188,46 +188,52 @@ export default function QuranPlayer() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background">
-      <div className="container mx-auto py-12 px-4 max-w-7xl">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/60 text-transparent bg-clip-text">
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      <div className="container mx-auto py-16 px-4 max-w-7xl">
+        <div className="text-center mb-16">
+          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 text-transparent bg-clip-text">
             Quran Player
           </h1>
-          <p className="text-muted-foreground">Listen, read, and reflect on the words of Allah</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Experience the divine words of the Quran through beautiful recitation and reflection
+          </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Surah List */}
-          <Card className="lg:col-span-4 p-6 shadow-xl border-primary/10 backdrop-blur-sm bg-background/50">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-primary">Surahs</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Enhanced Surah List */}
+          <Card className="lg:col-span-4 p-8 shadow-2xl border-primary/10 backdrop-blur-sm bg-background/50 rounded-2xl">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 text-transparent bg-clip-text">
+                Surahs
+              </h2>
               {currentSurah && (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm font-medium px-4 py-2 rounded-full bg-primary/10 text-primary">
                   {surahs.length} Chapters
                 </span>
               )}
             </div>
             <ScrollArea className="h-[75vh] pr-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {surahs.map((surah) => (
                   <Button
                     key={surah.number}
                     variant={currentSurah?.number === surah.number ? "default" : "ghost"}
-                    className={`w-full justify-start text-left p-4 h-auto ${
-                      currentSurah?.number === surah.number ? 'bg-primary/10' : ''
+                    className={`w-full justify-start text-left p-6 h-auto rounded-xl transition-all duration-300 ${
+                      currentSurah?.number === surah.number 
+                      ? 'bg-primary/15 shadow-lg' 
+                      : 'hover:bg-primary/5'
                     }`}
                     onClick={() => handleSurahSelect(surah)}
                   >
                     <div className="flex items-center w-full">
-                      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/5 mr-4">
-                        <span className="text-primary font-semibold">{surah.number}</span>
+                      <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary/5 mr-4">
+                        <span className="text-lg font-bold text-primary">{surah.number}</span>
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium">{surah.englishName}</div>
+                        <div className="text-lg font-semibold mb-1">{surah.englishName}</div>
                         <div className="text-sm text-muted-foreground flex justify-between items-center">
                           <span>{surah.englishNameTranslation}</span>
-                          <span className="font-arabic text-base">{surah.name}</span>
+                          <span className="font-arabic text-base text-primary/90">{surah.name}</span>
                         </div>
                       </div>
                     </div>
@@ -238,14 +244,14 @@ export default function QuranPlayer() {
           </Card>
 
           {/* Main Content */}
-          <div className="lg:col-span-8 space-y-6">
-            <Card className="p-8 shadow-xl border-primary/10 backdrop-blur-sm bg-background/50">
+          <div className="lg:col-span-8 space-y-8">
+            <Card className="p-10 shadow-2xl border-primary/10 backdrop-blur-sm bg-background/50 rounded-2xl">
               {isLoading ? (
                 <div className="flex items-center justify-center h-[60vh]">
                   <div className="relative">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-primary">
-                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24">
+                    <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-primary"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <svg className="w-10 h-10 text-primary" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                       </svg>
                     </div>
@@ -253,37 +259,37 @@ export default function QuranPlayer() {
                 </div>
               ) : currentSurah ? (
                 <>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 pb-8 border-b border-primary/10">
                     <div>
-                      <h2 className="text-4xl font-bold text-primary mb-2">
+                      <h2 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 text-transparent bg-clip-text mb-3">
                         {currentSurah.englishName}
                       </h2>
-                      <p className="text-muted-foreground">
+                      <p className="text-lg text-muted-foreground">
                         {currentSurah.englishNameTranslation}
                       </p>
                     </div>
-                    <div className="mt-4 md:mt-0 text-right">
-                      <span className="text-3xl font-arabic text-primary/90 block mb-1">
+                    <div className="mt-6 md:mt-0 text-right">
+                      <span className="text-4xl font-arabic text-primary block mb-2">
                         {currentSurah.name}
                       </span>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm font-medium px-4 py-2 rounded-full bg-primary/10 text-primary">
                         {currentSurah.revelationType} • {currentSurah.numberOfAyahs} Verses
                       </span>
                     </div>
                   </div>
 
-                  {/* Add Reciter Selection */}
-                  <div className="mb-6">
-                    <div className="flex items-center space-x-4">
-                      <label htmlFor="reciter" className="text-sm font-medium">
+                  {/* Enhanced Reciter Selection */}
+                  <div className="mb-10">
+                    <div className="flex items-center space-x-4 bg-primary/5 p-4 rounded-xl">
+                      <label htmlFor="reciter" className="text-sm font-medium text-primary whitespace-nowrap">
                         Select Reciter:
                       </label>
                       <select
                         id="reciter"
                         value={selectedReciter}
                         onChange={(e) => handleReciterChange(e.target.value)}
-                        className="flex-1 max-w-xs rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background 
-                          focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        className="flex-1 rounded-lg border border-primary/20 bg-background px-4 py-2 text-sm ring-offset-background 
+                          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200"
                       >
                         <option value="">Select a reciter</option>
                         {reciters.map((reciter) => (
@@ -295,12 +301,21 @@ export default function QuranPlayer() {
                     </div>
                   </div>
 
-                  {/* Display Bismillah separately */}
-                  {/* {currentSurah?.number !== 1 && currentSurah?.number !== 9 && (
-                    <div className="text-4xl text-center font-arabic leading-loose p-8 bg-primary/5 rounded-xl mb-4">
-                      بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                    </div>
-                  )} */}
+                  {/* View Toggle */}
+                  <div className="flex items-center justify-end space-x-3 mb-8">
+                    <Switch
+                      checked={showFullSurah}
+                      onCheckedChange={setShowFullSurah}
+                      id="view-mode"
+                      className="data-[state=checked]:bg-primary"
+                    />
+                    <label
+                      htmlFor="view-mode"
+                      className="text-sm font-medium cursor-pointer text-primary"
+                    >
+                      Show Full Surah
+                    </label>
+                  </div>
 
                   <div className="space-y-8">
                     {showFullSurah ? (
@@ -397,12 +412,12 @@ export default function QuranPlayer() {
               )}
             </Card>
 
-            {/* Audio Player */}
+            {/* Enhanced Audio Player */}
             {currentSurah && (
-              <Card className="p-6 shadow-xl border-primary/10 backdrop-blur-sm bg-background/50">
-                <div className="flex flex-col items-center space-y-6">
+              <Card className="p-8 shadow-2xl border-primary/10 backdrop-blur-sm bg-background/50 rounded-2xl">
+                <div className="flex flex-col items-center space-y-8">
                   {/* Continuous Play Toggle */}
-                  <div className="flex items-center space-x-3 bg-primary/5 px-4 py-2 rounded-full">
+                  <div className="flex items-center space-x-3 bg-primary/5 px-6 py-3 rounded-full">
                     <Switch
                       checked={isContinuousPlay}
                       onCheckedChange={setIsContinuousPlay}
@@ -411,19 +426,19 @@ export default function QuranPlayer() {
                     />
                     <label
                       htmlFor="continuous-play"
-                      className="text-sm font-medium cursor-pointer"
+                      className="text-sm font-medium cursor-pointer text-primary"
                     >
                       Continuous Play
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-center space-x-6">
+                  <div className="flex items-center justify-center space-x-8">
                     <Button 
                       variant="outline" 
                       size="icon"
                       onClick={playPreviousAyah}
                       disabled={currentAyahIndex === 0}
-                      className="w-12 h-12 rounded-full"
+                      className="w-14 h-14 rounded-full hover:bg-primary/5 transition-colors duration-200"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -433,7 +448,7 @@ export default function QuranPlayer() {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="h-5 w-5"
+                        className="h-6 w-6"
                       >
                         <polygon points="19 20 9 12 19 4 19 20"></polygon>
                         <line x1="5" y1="19" x2="5" y2="5"></line>
@@ -444,7 +459,7 @@ export default function QuranPlayer() {
                       <Button 
                         size="icon" 
                         onClick={pauseAudio}
-                        className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90"
+                        className="w-20 h-20 rounded-full bg-primary hover:bg-primary/90 transition-colors duration-200 shadow-lg"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -454,7 +469,7 @@ export default function QuranPlayer() {
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="h-6 w-6"
+                          className="h-8 w-8"
                         >
                           <rect x="6" y="4" width="4" height="16"></rect>
                           <rect x="14" y="4" width="4" height="16"></rect>
@@ -464,7 +479,7 @@ export default function QuranPlayer() {
                       <Button 
                         size="icon" 
                         onClick={playAudio}
-                        className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90"
+                        className="w-20 h-20 rounded-full bg-primary hover:bg-primary/90 transition-colors duration-200 shadow-lg"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -474,7 +489,7 @@ export default function QuranPlayer() {
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="h-6 w-6"
+                          className="h-8 w-8"
                         >
                           <polygon points="5 3 19 12 5 21 5 3"></polygon>
                         </svg>
@@ -486,7 +501,7 @@ export default function QuranPlayer() {
                       size="icon" 
                       onClick={playNextAyah}
                       disabled={currentAyahIndex === currentAyahs.length - 1}
-                      className="w-12 h-12 rounded-full"
+                      className="w-14 h-14 rounded-full hover:bg-primary/5 transition-colors duration-200"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -496,7 +511,7 @@ export default function QuranPlayer() {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="h-5 w-5"
+                        className="h-6 w-6"
                       >
                         <polygon points="5 4 15 12 5 20 5 4"></polygon>
                         <line x1="19" y1="5" x2="19" y2="19"></line>
@@ -507,7 +522,7 @@ export default function QuranPlayer() {
                       variant="outline" 
                       size="icon"
                       onClick={stopAudio}
-                      className="w-12 h-12 rounded-full"
+                      className="w-14 h-14 rounded-full hover:bg-primary/5 transition-colors duration-200"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -517,7 +532,7 @@ export default function QuranPlayer() {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="h-5 w-5"
+                        className="h-6 w-6"
                       >
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                       </svg>
