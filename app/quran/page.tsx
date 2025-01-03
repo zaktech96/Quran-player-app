@@ -42,17 +42,22 @@ export default function QuranPlayer() {
   useEffect(() => {
     const loadSurahs = async () => {
       try {
-        const data = await getAllSurahs()
-        setSurahs(data)
-        setIsLoading(false)
+        setIsLoading(true);
+        const data = await getAllSurahs();
+        if (data.length > 0) {
+          setSurahs(data);
+        } else {
+          console.error("No surahs returned");
+        }
       } catch (error) {
-        console.error("Failed to load surahs:", error)
-        setIsLoading(false)
+        console.error("Failed to load surahs:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadSurahs()
-  }, [])
+    loadSurahs();
+  }, []);
 
   useEffect(() => {
     if (audioRef) {
