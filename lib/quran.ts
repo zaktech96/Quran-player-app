@@ -10,11 +10,10 @@ export const EDITION_TYPES = {
   TRANSLITERATION: "transliteration"
 } as const
 
-// Default editions
+// Default editions - using specific Uthmani script edition
 const DEFAULT_EDITIONS = {
-  ARABIC: "quran-uthmani",
-  ENGLISH: "en.asad",
-  AUDIO: "ar.alafasy"
+  ARABIC: "quran-uthmani",  // Using the official Uthmani script
+  ENGLISH: "en.asad"
 } as const
 
 export async function getAvailableEditions(type?: string, language?: string): Promise<QuranEdition[]> {
@@ -54,12 +53,11 @@ export async function getSurah(
   translation?: QuranEdition
 }> {
   try {
-    // Use provided editions or defaults
-    const arabicEdition = options.edition || DEFAULT_EDITIONS.ARABIC
+    // Always use Uthmani script for Arabic text
+    const arabicEdition = DEFAULT_EDITIONS.ARABIC
     const translationEdition = options.translation || DEFAULT_EDITIONS.ENGLISH
-    const audioEdition = options.audio || DEFAULT_EDITIONS.AUDIO
 
-    // Get Arabic text
+    // Get Arabic text from Uthmani script
     const arabicResponse = await fetch(`${API_BASE_URL}/quran/${arabicEdition}`)
     const arabicData = await arabicResponse.json()
     const surahData = arabicData.data.surahs[number - 1]
@@ -68,23 +66,18 @@ export async function getSurah(
     const translationResponse = await fetch(`${API_BASE_URL}/surah/${number}/${translationEdition}`)
     const translationData = await translationResponse.json()
 
-    // Get audio
-    const audioResponse = await fetch(`${API_BASE_URL}/surah/${number}/${audioEdition}`)
-    const audioData = await audioResponse.json()
-
     // Get edition information
     const [editionInfo, translationInfo] = await Promise.all([
       getEditionInfo(arabicEdition),
       getEditionInfo(translationEdition)
     ])
 
-    // Directly process the ayahs from API without filtering
+    // Process the ayahs directly from the API without any modifications
     const ayahs = surahData.ayahs.map((ayah: any, index: number) => ({
       number: ayah.number,
       numberInSurah: ayah.numberInSurah,
       text: ayah.text,
-      translation: translationData.data.ayahs[index]?.text,  // Use the same index for translation
-      audio: audioData.data.ayahs[index]?.audio  // Use the same index for audio
+      translation: translationData.data.ayahs[index].text
     }))
 
     return { 

@@ -8,6 +8,15 @@ import { Surah, Ayah } from "@/types/quran"
 import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 
+type Reciter = {
+  id: string;
+  name: string;
+  arabicName: string;
+  format: string;
+  type: string;
+  direction: string;
+};
+
 export default function QuranPlayer() {
   const [surahs, setSurahs] = useState<Surah[]>([])
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null)
@@ -18,6 +27,26 @@ export default function QuranPlayer() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isContinuousPlay, setIsContinuousPlay] = useState(true)
   const [showFullSurah, setShowFullSurah] = useState(false)
+  const [selectedReciter, setSelectedReciter] = useState<string>("ar.alafasy")
+  const [reciters, setReciters] = useState<Reciter[]>([])
+  const [isLoadingReciters, setIsLoadingReciters] = useState(true)
+
+  useEffect(() => {
+    const fetchReciters = async () => {
+      try {
+        const response = await fetch('/api/reciters');
+        const data = await response.json();
+        console.log('Fetched reciters:', data); // Debug log
+        if (Array.isArray(data)) {
+          setReciters(data);
+        }
+      } catch (error) {
+        console.error('Error fetching reciters:', error);
+      }
+    };
+
+    fetchReciters();
+  }, []);
 
   useEffect(() => {
     const loadSurahs = async () => {
@@ -61,10 +90,11 @@ export default function QuranPlayer() {
       setIsPlaying(false)
       
       if (audioRef) {
-        audioRef.src = ayahs[0].audio
+        const newAudioUrl = getAudioUrl(ayahs[0].number, selectedReciter)
+        audioRef.src = newAudioUrl
         audioRef.load()
       } else {
-        const audio = new Audio(ayahs[0].audio)
+        const audio = new Audio(getAudioUrl(ayahs[0].number, selectedReciter))
         setAudioRef(audio)
       }
     } catch (error) {
@@ -101,7 +131,8 @@ export default function QuranPlayer() {
       const nextIndex = currentAyahIndex + 1
       setCurrentAyahIndex(nextIndex)
       if (audioRef) {
-        audioRef.src = currentAyahs[nextIndex].audio
+        const newAudioUrl = getAudioUrl(currentAyahs[nextIndex].number, selectedReciter)
+        audioRef.src = newAudioUrl
         audioRef.load()
         audioRef.play()
         setIsPlaying(true)
@@ -116,13 +147,45 @@ export default function QuranPlayer() {
       const prevIndex = currentAyahIndex - 1
       setCurrentAyahIndex(prevIndex)
       if (audioRef) {
-        audioRef.src = currentAyahs[prevIndex].audio
+        const newAudioUrl = getAudioUrl(currentAyahs[prevIndex].number, selectedReciter)
+        audioRef.src = newAudioUrl
         audioRef.load()
         audioRef.play()
         setIsPlaying(true)
       }
     }
   }
+
+  const getAudioUrl = (ayahNumber: number, reciterId: string) => {
+    // mp3quran.net moshaf API format
+    const moshafId = "11"; // Using default moshaf_id=11 for Hafs narration
+    const surahNumber = Math.floor((ayahNumber - 1) / 6236 * 114) + 1;
+    const ayahInSurah = ayahNumber % 6236 || 6236;
+    
+    return `https://mp3quran.net/api/v3/moshaf/${moshafId}/ayat/${surahNumber}/${ayahInSurah}`;
+  };
+
+  const handleReciterChange = async (reciterId: string) => {
+    setSelectedReciter(reciterId);
+    if (audioRef && currentAyahs[currentAyahIndex]) {
+      const newAudioUrl = getAudioUrl(currentAyahs[currentAyahIndex].number, reciterId);
+      console.log('New audio URL:', newAudioUrl);
+      
+      // Test if the audio URL is accessible
+      try {
+        const response = await fetch(newAudioUrl, { method: 'HEAD' });
+        if (response.ok) {
+          audioRef.src = newAudioUrl;
+          audioRef.load();
+          setIsPlaying(false);
+        } else {
+          console.error('Audio URL not accessible:', newAudioUrl);
+        }
+      } catch (error) {
+        console.error('Error testing audio URL:', error);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background">
@@ -209,21 +272,44 @@ export default function QuranPlayer() {
                     </div>
                   </div>
 
-                  Display Bismillah
-                  {currentSurah?.number !== 1 && currentSurah?.number !== 9 && (
+                  {/* Add Reciter Selection */}
+                  <div className="mb-6">
+                    <div className="flex items-center space-x-4">
+                      <label htmlFor="reciter" className="text-sm font-medium">
+                        Select Reciter:
+                      </label>
+                      <select
+                        id="reciter"
+                        value={selectedReciter}
+                        onChange={(e) => handleReciterChange(e.target.value)}
+                        className="flex-1 max-w-xs rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background 
+                          focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      >
+                        <option value="">Select a reciter</option>
+                        {reciters.map((reciter) => (
+                          <option key={reciter.id} value={reciter.id}>
+                            {reciter.name} ({reciter.arabicName})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Display Bismillah separately */}
+                  {/* {currentSurah?.number !== 1 && currentSurah?.number !== 9 && (
                     <div className="text-4xl text-center font-arabic leading-loose p-8 bg-primary/5 rounded-xl mb-4">
                       بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                     </div>
-                  )} 
+                  )} */}
+
                   <div className="space-y-8">
                     {showFullSurah ? (
                       <div className="space-y-12">
                         {currentAyahs.map((ayah, index) => {
-                          // Remove Bismillah from the first verse
-                          let ayahText = ayah.text;
-                          if (index === 0 && ayahText.startsWith("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ")) {
-                            ayahText = ayahText.replace("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "").trim();
-                          }
+                          // Remove Bismillah from the first verse of every surah
+                          const displayText = index === 0 
+                            ? ayah.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                            : ayah.text;
 
                           return (
                             <div key={ayah.number} className="space-y-6">
@@ -246,15 +332,16 @@ export default function QuranPlayer() {
                                 dir="rtl"
                                 lang="ar"
                                 onClick={() => {
-                                  setCurrentAyahIndex(index);
+                                  setCurrentAyahIndex(index)
                                   if (audioRef) {
-                                    audioRef.src = ayah.audio;
-                                    audioRef.load();
-                                    setIsPlaying(false);
+                                    const newAudioUrl = getAudioUrl(ayah.number, selectedReciter)
+                                    audioRef.src = newAudioUrl
+                                    audioRef.load()
+                                    setIsPlaying(false)
                                   }
                                 }}
                               >
-                                {ayahText}
+                                {displayText}
                               </div>
                               
                               {/* Translation */}
@@ -267,7 +354,7 @@ export default function QuranPlayer() {
                       </div>
                     ) : (
                       <div className="space-y-8 mt-8">
-                        {/* Ayah Number */}
+                        {/* Single Ayah view */}
                         <div className="flex items-center justify-center space-x-4">
                           <div className="h-px flex-1 bg-border"></div>
                           <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
@@ -282,7 +369,9 @@ export default function QuranPlayer() {
                           dir="rtl"
                           lang="ar"
                         >
-                          {currentAyahs[currentAyahIndex]?.text}
+                          {currentAyahIndex === 0 
+                            ? currentAyahs[currentAyahIndex]?.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                            : currentAyahs[currentAyahIndex]?.text}
                         </div>
                         
                         {/* Translation */}
