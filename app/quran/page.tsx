@@ -17,6 +17,7 @@ export default function QuranPlayer() {
   const [currentAyahIndex, setCurrentAyahIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isContinuousPlay, setIsContinuousPlay] = useState(true)
+  const [showFullSurah, setShowFullSurah] = useState(false)
 
   useEffect(() => {
     const loadSurahs = async () => {
@@ -207,24 +208,98 @@ export default function QuranPlayer() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Add View Toggle Switch */}
+                  <div className="flex items-center justify-end space-x-3 mb-6">
+                    <Switch
+                      checked={showFullSurah}
+                      onCheckedChange={setShowFullSurah}
+                      id="view-mode"
+                      className="data-[state=checked]:bg-primary"
+                    />
+                    <label
+                      htmlFor="view-mode"
+                      className="text-sm font-medium cursor-pointer"
+                    >
+                      Show Full Surah
+                    </label>
+                  </div>
+
                   <div className="space-y-8">
-                    {/* Ayah Number */}
-                    <div className="flex items-center justify-center space-x-4">
-                      <div className="h-px flex-1 bg-border"></div>
-                      <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
-                        Verse {currentAyahs[currentAyahIndex]?.numberInSurah} of {currentSurah.numberOfAyahs}
+                    {/* Show Bismillah only for surahs other than Al-Fatiha and At-Tawbah */}
+                    {currentSurah?.number !== 1 && currentSurah?.number !== 9 && (
+                      <div className="text-4xl text-center font-arabic leading-loose p-8 bg-primary/5 rounded-xl mb-8">
+                        بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                       </div>
-                      <div className="h-px flex-1 bg-border"></div>
-                    </div>
-                    {/* Arabic Text */}
-                    <div className="text-4xl text-right font-arabic leading-loose p-8 bg-primary/5 rounded-xl">
-                      {currentAyahs[currentAyahIndex]?.text}
-                    </div>
-                    
-                    {/* Translation */}
-                    <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
-                      {currentAyahs[currentAyahIndex]?.translation}
-                    </div>
+                    )}
+
+                    {showFullSurah ? (
+                      <div className="space-y-12">
+                        {currentAyahs.map((ayah, index) => (
+                          <div key={ayah.number} className="space-y-6">
+                            {/* Ayah Number */}
+                            <div className="flex items-center justify-center space-x-4">
+                              <div className="h-px flex-1 bg-border"></div>
+                              <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
+                                Verse {ayah.numberInSurah} of {currentSurah.numberOfAyahs}
+                              </div>
+                              <div className="h-px flex-1 bg-border"></div>
+                            </div>
+                            
+                            {/* Arabic Text */}
+                            <div 
+                              className={`text-4xl text-right font-arabic leading-loose p-8 rounded-xl cursor-pointer transition-colors duration-200 ${
+                                currentAyahIndex === index 
+                                ? 'bg-primary/20 shadow-lg border border-primary/20' 
+                                : 'bg-primary/5 hover:bg-primary/10 hover:shadow-md'
+                              }`}
+                              dir="rtl"
+                              lang="ar"
+                              onClick={() => {
+                                setCurrentAyahIndex(index);
+                                if (audioRef) {
+                                  audioRef.src = ayah.audio;
+                                  audioRef.load();
+                                  setIsPlaying(false);
+                                }
+                              }}
+                            >
+                              {ayah.text}
+                            </div>
+                            
+                            {/* Translation */}
+                            <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
+                              {ayah.translation}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-8 mt-8">
+                        {/* Ayah Number */}
+                        <div className="flex items-center justify-center space-x-4">
+                          <div className="h-px flex-1 bg-border"></div>
+                          <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
+                            Verse {currentAyahs[currentAyahIndex]?.numberInSurah} of {currentSurah.numberOfAyahs}
+                          </div>
+                          <div className="h-px flex-1 bg-border"></div>
+                        </div>
+
+                        {/* Arabic Text */}
+                        <div 
+                          className="text-4xl text-right font-arabic leading-loose p-8 bg-primary/5 rounded-xl"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          {currentAyahs[currentAyahIndex]?.text}
+                        </div>
+                        
+                        {/* Translation */}
+                        <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
+                          {currentAyahs[currentAyahIndex]?.translation}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
