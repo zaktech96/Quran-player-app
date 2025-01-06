@@ -78,34 +78,51 @@ export default function QuranPlayer() {
 
   const handleSurahSelect = async (surah: Surah) => {
     try {
-      setIsLoading(true)
-      const { ayahs } = await getSurah(surah.number)
-      setCurrentSurah(surah)
-      setCurrentAyahs(ayahs)
-      setCurrentAyahIndex(0)
-      setIsPlaying(false)
+      setIsLoading(true);
+      const { ayahs } = await getSurah(surah.number);
+      setCurrentSurah(surah);
+      setCurrentAyahs(ayahs);
+      setCurrentAyahIndex(0);
+      setIsPlaying(false);
       
       if (audioRef) {
-        const newAudioUrl = getAudioUrl(ayahs[0].number, selectedReciter)
-        audioRef.src = newAudioUrl
-        audioRef.load()
+        try {
+          const response = await fetch(getAudioUrl(ayahs[0].number, selectedReciter));
+          if (response.ok) {
+            const data = await response.json();
+            audioRef.src = data.audio_file.url;
+            await audioRef.load();
+          }
+        } catch (error) {
+          console.error('Error loading initial audio:', error);
+        }
       } else {
-        const audio = new Audio(getAudioUrl(ayahs[0].number, selectedReciter))
-        setAudioRef(audio)
+        const audio = new Audio();
+        setAudioRef(audio);
       }
     } catch (error) {
-      console.error("Failed to load surah:", error)
+      console.error("Failed to load surah:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const playAudio = () => {
-    if (audioRef) {
-      audioRef.play()
-      setIsPlaying(true)
+  const playAudio = async () => {
+    if (audioRef && currentAyahs[currentAyahIndex]) {
+      try {
+        const response = await fetch(getAudioUrl(currentAyahs[currentAyahIndex].number, selectedReciter));
+        if (response.ok) {
+          const data = await response.json();
+          audioRef.src = data.audio_file.url;
+          await audioRef.load();
+          await audioRef.play();
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        console.error('Error playing audio:', error);
+      }
     }
-  }
+  };
 
   const pauseAudio = () => {
     if (audioRef) {
@@ -122,63 +139,77 @@ export default function QuranPlayer() {
     }
   }
 
-  const playNextAyah = () => {
+  const playNextAyah = async () => {
     if (currentAyahIndex < currentAyahs.length - 1) {
-      const nextIndex = currentAyahIndex + 1
-      setCurrentAyahIndex(nextIndex)
+      const nextIndex = currentAyahIndex + 1;
+      setCurrentAyahIndex(nextIndex);
       if (audioRef) {
-        const newAudioUrl = getAudioUrl(currentAyahs[nextIndex].number, selectedReciter)
-        audioRef.src = newAudioUrl
-        audioRef.load()
-        audioRef.play()
-        setIsPlaying(true)
+        try {
+          const response = await fetch(getAudioUrl(currentAyahs[nextIndex].number, selectedReciter));
+          if (response.ok) {
+            const data = await response.json();
+            audioRef.src = data.audio_file.url;
+            await audioRef.load();
+            await audioRef.play();
+            setIsPlaying(true);
+          }
+        } catch (error) {
+          console.error('Error playing next ayah:', error);
+        }
       }
     } else {
-      stopAudio()
+      stopAudio();
     }
-  }
+  };
 
-  const playPreviousAyah = () => {
+  const playPreviousAyah = async () => {
     if (currentAyahIndex > 0) {
-      const prevIndex = currentAyahIndex - 1
-      setCurrentAyahIndex(prevIndex)
+      const prevIndex = currentAyahIndex - 1;
+      setCurrentAyahIndex(prevIndex);
       if (audioRef) {
-        const newAudioUrl = getAudioUrl(currentAyahs[prevIndex].number, selectedReciter)
-        audioRef.src = newAudioUrl
-        audioRef.load()
-        audioRef.play()
-        setIsPlaying(true)
+        try {
+          const response = await fetch(getAudioUrl(currentAyahs[prevIndex].number, selectedReciter));
+          if (response.ok) {
+            const data = await response.json();
+            audioRef.src = data.audio_file.url;
+            await audioRef.load();
+            await audioRef.play();
+            setIsPlaying(true);
+          }
+        } catch (error) {
+          console.error('Error playing previous ayah:', error);
+        }
       }
     }
-  }
+  };
 
   const getAudioUrl = (ayahNumber: number, reciterId: string) => {
-    // mp3quran.net moshaf API format
-    const moshafId = "11"; // Using default moshaf_id=11 for Hafs narration
-    const surahNumber = Math.floor((ayahNumber - 1) / 6236 * 114) + 1;
-    const ayahInSurah = ayahNumber % 6236 || 6236;
+    // Using Quran.com API v4 for audio recitations
+    const surahNumber = currentSurah?.number;
+    const ayahInSurah = currentAyahs[currentAyahIndex]?.numberInSurah;
     
-    return `https://mp3quran.net/api/v3/moshaf/${moshafId}/ayat/${surahNumber}/${ayahInSurah}`;
+    return `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${surahNumber}/${ayahInSurah}`;
   };
 
   const handleReciterChange = async (reciterId: string) => {
     setSelectedReciter(reciterId);
     if (audioRef && currentAyahs[currentAyahIndex]) {
       const newAudioUrl = getAudioUrl(currentAyahs[currentAyahIndex].number, reciterId);
-      console.log('New audio URL:', newAudioUrl);
       
-      // Test if the audio URL is accessible
       try {
-        const response = await fetch(newAudioUrl, { method: 'HEAD' });
+        const response = await fetch(newAudioUrl);
         if (response.ok) {
-          audioRef.src = newAudioUrl;
+          const data = await response.json();
+          // Update audio source with the audio URL from the API response
+          const audioUrl = data.audio_file.url;
+          audioRef.src = audioUrl;
           audioRef.load();
           setIsPlaying(false);
         } else {
-          console.error('Audio URL not accessible:', newAudioUrl);
+          console.error('Failed to fetch audio URL:', newAudioUrl);
         }
       } catch (error) {
-        console.error('Error testing audio URL:', error);
+        console.error('Error fetching audio:', error);
       }
     }
   };
@@ -254,8 +285,8 @@ export default function QuranPlayer() {
                   </div>
                 </div>
               ) : currentSurah ? (
-                <>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 pb-8 border-b border-primary/10">
+                <div className="flex flex-col h-[75vh]">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between pb-8 border-b border-primary/10">
                     <div>
                       <h2 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 text-transparent bg-clip-text mb-3">
                         {currentSurah.englishName}
@@ -275,7 +306,7 @@ export default function QuranPlayer() {
                   </div>
 
                   {/* Enhanced Reciter Selection */}
-                  <div className="mb-10">
+                  <div className="py-4">
                     <div className="flex items-center space-x-4 bg-primary/5 p-4 rounded-xl">
                       <label htmlFor="reciter" className="text-sm font-medium text-primary whitespace-nowrap">
                         Select Reciter:
@@ -298,7 +329,7 @@ export default function QuranPlayer() {
                   </div>
 
                   {/* View Toggle */}
-                  <div className="flex items-center justify-end space-x-3 mb-8">
+                  <div className="flex items-center justify-end space-x-3 py-4">
                     <Switch
                       checked={showFullSurah}
                       onCheckedChange={setShowFullSurah}
@@ -313,85 +344,99 @@ export default function QuranPlayer() {
                     </label>
                   </div>
 
-                  <div className="space-y-8">
-                    {showFullSurah ? (
-                      <div className="space-y-12">
-                        {currentAyahs.map((ayah, index) => {
-                          // Remove Bismillah from the first verse of every surah
-                          const displayText = index === 0 
-                            ? ayah.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
-                            : ayah.text;
+                  <ScrollArea className="flex-grow">
+                    <div className="space-y-6">
+                      {showFullSurah ? (
+                        <div className="space-y-6">
+                          {currentAyahs.map((ayah, index) => {
+                            const displayText = index === 0 
+                              ? ayah.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                              : ayah.text;
 
-                          return (
-                            <div key={ayah.number} className="space-y-6">
-                              {/* Ayah Number */}
-                              <div className="flex items-center justify-center space-x-4">
-                                <div className="h-px flex-1 bg-border"></div>
-                                <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
-                                  Verse {ayah.numberInSurah} of {currentSurah.numberOfAyahs}
-                                </div>
-                                <div className="h-px flex-1 bg-border"></div>
-                              </div>
-
-                              {/* Arabic Text */}
+                            return (
                               <div 
-                                className={`text-4xl text-right font-arabic leading-loose p-8 rounded-xl cursor-pointer transition-colors duration-200 ${
-                                  currentAyahIndex === index 
-                                  ? 'bg-primary/20 shadow-lg border border-primary/20' 
-                                  : 'bg-primary/5 hover:bg-primary/10 hover:shadow-md'
-                                }`}
-                                dir="rtl"
-                                lang="ar"
-                                onClick={() => {
-                                  setCurrentAyahIndex(index)
-                                  if (audioRef) {
-                                    const newAudioUrl = getAudioUrl(ayah.number, selectedReciter)
-                                    audioRef.src = newAudioUrl
-                                    audioRef.load()
-                                    setIsPlaying(false)
-                                  }
-                                }}
+                                key={ayah.number} 
+                                className="scroll-mt-6 bg-background/50 rounded-xl p-6"
+                                id={`verse-${ayah.numberInSurah}`}
                               >
-                                {displayText}
-                              </div>
-                              {/* Translation */}
-                              <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
-                                {ayah.translation}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="space-y-8 mt-8">
-                        {/* Single Ayah view */}
-                        <div className="flex items-center justify-center space-x-4">
-                          <div className="h-px flex-1 bg-border"></div>
-                          <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
-                            Verse {currentAyahs[currentAyahIndex]?.numberInSurah} of {currentSurah.numberOfAyahs}
-                          </div>
-                          <div className="h-px flex-1 bg-border"></div>
-                        </div>
+                                {/* Ayah Number */}
+                                <div className="flex items-center justify-center space-x-4 opacity-70 mb-4">
+                                  <div className="h-px flex-1 bg-border"></div>
+                                  <div className="px-4 py-1.5 rounded-full bg-primary/5 text-sm font-medium">
+                                    {ayah.numberInSurah}
+                                  </div>
+                                  <div className="h-px flex-1 bg-border"></div>
+                                </div>
 
-                        {/* Arabic Text */}
-                        <div 
-                          className="text-4xl text-right font-arabic leading-loose p-8 bg-primary/5 rounded-xl"
-                          dir="rtl"
-                          lang="ar"
-                        >
-                          {currentAyahIndex === 0 
-                            ? currentAyahs[currentAyahIndex]?.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
-                            : currentAyahs[currentAyahIndex]?.text}
+                                {/* Arabic Text */}
+                                <div 
+                                  className={`text-4xl text-right font-arabic leading-[2] tracking-[0.02em] px-8 py-6 rounded-xl cursor-pointer transition-all duration-200 ${
+                                    currentAyahIndex === index 
+                                    ? 'bg-primary/20 shadow-lg border border-primary/20 scale-[1.02]' 
+                                    : 'bg-primary/5 hover:bg-primary/10 hover:shadow-md hover:scale-[1.01]'
+                                  }`}
+                                  dir="rtl"
+                                  lang="ar"
+                                  onClick={() => {
+                                    setCurrentAyahIndex(index)
+                                    if (audioRef) {
+                                      const newAudioUrl = getAudioUrl(ayah.number, selectedReciter)
+                                      audioRef.src = newAudioUrl
+                                      audioRef.load()
+                                      setIsPlaying(false)
+                                    }
+                                    document.getElementById(`verse-${ayah.numberInSurah}`)?.scrollIntoView({
+                                      behavior: 'smooth',
+                                      block: 'center'
+                                    })
+                                  }}
+                                >
+                                  <span className="inline-block">{displayText}</span>
+                                  <span className="inline-block mr-4 text-2xl text-primary/60">﴿{ayah.numberInSurah}﴾</span>
+                                </div>
+
+                                {/* Translation */}
+                                <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg mt-4">
+                                  {ayah.translation}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        
-                        {/* Translation */}
-                        <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg">
-                          {currentAyahs[currentAyahIndex]?.translation}
+                      ) : (
+                        <div className="bg-background/50 rounded-xl p-6">
+                          {/* Single Ayah view */}
+                          <div className="flex items-center justify-center space-x-4 mb-4">
+                            <div className="h-px flex-1 bg-border"></div>
+                            <div className="px-4 py-2 rounded-full bg-primary/5 text-sm font-medium">
+                              Verse {currentAyahs[currentAyahIndex]?.numberInSurah} of {currentSurah.numberOfAyahs}
+                            </div>
+                            <div className="h-px flex-1 bg-border"></div>
+                          </div>
+
+                          {/* Arabic Text */}
+                          <div 
+                            className="text-4xl text-right font-arabic leading-[2] tracking-[0.02em] px-8 py-6 bg-primary/5 rounded-xl"
+                            dir="rtl"
+                            lang="ar"
+                          >
+                            <span className="inline-block">
+                              {currentAyahIndex === 0 
+                                ? currentAyahs[currentAyahIndex]?.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                                : currentAyahs[currentAyahIndex]?.text}
+                            </span>
+                            <span className="inline-block mr-4 text-2xl text-primary/60">﴿{currentAyahs[currentAyahIndex]?.numberInSurah}﴾</span>
+                          </div>
+                          
+                          {/* Translation */}
+                          <div className="text-lg text-muted-foreground leading-relaxed bg-muted/30 p-6 rounded-lg mt-4">
+                            {currentAyahs[currentAyahIndex]?.translation}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
                   <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center mb-4">
