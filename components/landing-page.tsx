@@ -234,23 +234,28 @@ export function LandingPage() {
                   className="h-full"
                 >
                   <Link href={feature.link} className="block h-full">
-                    <Card className="p-8 h-full bg-white hover:shadow-lg transition-all duration-300 rounded-[32px]">
+                    <Card className="relative p-8 h-full bg-gradient-to-br from-white via-white to-green-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-green-900/30 hover:shadow-xl transition-all duration-300 rounded-[32px] border border-green-100/20 dark:border-green-800/20 backdrop-blur-sm group">
                       <div className="space-y-6">
                         {/* Icon */}
-                        <div className="w-14 h-14 rounded-2xl bg-[#E7F5E8] flex items-center justify-center">
-                          <div className="text-green-700">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-200 to-emerald-100 dark:from-green-800 dark:to-emerald-900 shadow-inner group-hover:shadow-lg transition-all duration-300 flex items-center justify-center">
+                          <div className="text-green-700 dark:text-green-300 transform group-hover:scale-110 transition-transform duration-300">
                             {feature.icon}
                           </div>
                         </div>
                         
                         {/* Content */}
                         <div className="space-y-3">
-                          <h3 className="text-2xl font-bold text-green-700">
+                          <h3 className="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 dark:from-green-200 dark:to-green-400 text-transparent bg-clip-text group-hover:scale-[1.02] transition-transform duration-300">
                             {feature.title}
                           </h3>
-                          <p className="text-gray-600 leading-relaxed">
+                          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             {feature.description}
                           </p>
+                        </div>
+
+                        {/* Arrow Icon */}
+                        <div className="absolute bottom-8 right-8 w-8 h-8 rounded-full bg-gradient-to-r from-green-100 to-emerald-50 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                          <ChevronRight className="w-5 h-5 text-green-700 dark:text-green-300" />
                         </div>
                       </div>
                     </Card>

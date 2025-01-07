@@ -77,29 +77,39 @@ export default function QuranPlayer() {
     }
   }
 
+  // Initialize audio element
+  useEffect(() => {
+    const audio = new Audio();
+    setAudioRef(audio);
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
   const handleSurahSelect = async (surah: Surah) => {
     try {
       setIsLoading(true);
-      const { ayahs } = await getSurah(surah.number);
       setCurrentSurah(surah);
-      setCurrentAyahs(ayahs);
-      setCurrentAyahIndex(0);
-      setIsPlaying(false);
-      
-      if (audioRef) {
-        try {
-          const response = await fetch(getAudioUrl(ayahs[0].number, selectedReciter));
-          if (response.ok) {
-            const data = await response.json();
-            audioRef.src = data.audio_file.url;
-            await audioRef.load();
+      const { ayahs } = await getSurah(surah.number);
+      if (ayahs.length > 0) {
+        setCurrentAyahs(ayahs);
+        setCurrentAyahIndex(0);
+        if (audioRef) {
+          audioRef.pause();
+          setIsPlaying(false);
+          const newAudioUrl = getAudioUrl(ayahs[0].number, selectedReciter);
+          try {
+            const response = await fetch(newAudioUrl);
+            if (response.ok) {
+              const audioData = await response.json();
+              audioRef.src = audioData.audio_file.url;
+              await audioRef.load();
+            }
+          } catch (error) {
+            console.error('Error loading audio:', error);
           }
-        } catch (error) {
-          console.error('Error loading initial audio:', error);
         }
-      } else {
-        const audio = new Audio();
-        setAudioRef(audio);
       }
     } catch (error) {
       console.error("Failed to load surah:", error);
@@ -111,14 +121,8 @@ export default function QuranPlayer() {
   const playAudio = async () => {
     if (audioRef && currentAyahs[currentAyahIndex]) {
       try {
-        const response = await fetch(getAudioUrl(currentAyahs[currentAyahIndex].number, selectedReciter));
-        if (response.ok) {
-          const data = await response.json();
-          audioRef.src = data.audio_file.url;
-          await audioRef.load();
-          await audioRef.play();
-          setIsPlaying(true);
-        }
+        await audioRef.play();
+        setIsPlaying(true);
       } catch (error) {
         console.error('Error playing audio:', error);
       }
@@ -127,18 +131,18 @@ export default function QuranPlayer() {
 
   const pauseAudio = () => {
     if (audioRef) {
-      audioRef.pause()
-      setIsPlaying(false)
+      audioRef.pause();
+      setIsPlaying(false);
     }
-  }
+  };
 
   const stopAudio = () => {
     if (audioRef) {
-      audioRef.pause()
-      audioRef.currentTime = 0
-      setIsPlaying(false)
+      audioRef.pause();
+      audioRef.currentTime = 0;
+      setIsPlaying(false);
     }
-  }
+  };
 
   const playNextAyah = async () => {
     if (currentAyahIndex < currentAyahs.length - 1) {
@@ -146,7 +150,8 @@ export default function QuranPlayer() {
       setCurrentAyahIndex(nextIndex);
       if (audioRef) {
         try {
-          const response = await fetch(getAudioUrl(currentAyahs[nextIndex].number, selectedReciter));
+          const newAudioUrl = getAudioUrl(currentAyahs[nextIndex].number, selectedReciter);
+          const response = await fetch(newAudioUrl);
           if (response.ok) {
             const data = await response.json();
             audioRef.src = data.audio_file.url;
@@ -158,8 +163,6 @@ export default function QuranPlayer() {
           console.error('Error playing next ayah:', error);
         }
       }
-    } else {
-      stopAudio();
     }
   };
 
