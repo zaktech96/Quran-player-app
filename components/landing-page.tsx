@@ -14,32 +14,26 @@ export function LandingPage() {
       description: "Access the complete Quran with clear Arabic text and translations",
       icon: <BookOpen className="w-6 h-6 md:w-8 md:h-8" />,
       link: "/quran",
-      gradient: "from-emerald-400 to-green-600",
-      image: "/images/quran-reading.jpg",
-      alt: "Digital Quran reading interface"
+      gradient: "from-emerald-400 to-green-600"
     },
     {
       title: "Listen to Recitations",
       description: "Experience beautiful recitations from renowned Qaris",
       icon: <Headphones className="w-6 h-6 md:w-8 md:h-8" />,
       link: "/quran",
-      gradient: "from-green-400 to-teal-600",
-      image: "/images/quran-recitation.jpg",
-      alt: "Quran recitation audio interface"
+      gradient: "from-green-400 to-teal-600"
     },
     {
       title: "Multiple Translations",
       description: "Read translations in various languages to understand better",
       icon: <Globe className="w-6 h-6 md:w-8 md:h-8" />,
       link: "/quran",
-      gradient: "from-teal-400 to-emerald-600",
-      image: "/images/quran-translations.jpg",
-      alt: "Quran translations in multiple languages"
+      gradient: "from-teal-400 to-emerald-600"
     }
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FCFCFC] dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#FCFCFC] to-green-50/30 dark:from-gray-950 dark:to-green-950/30">
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">

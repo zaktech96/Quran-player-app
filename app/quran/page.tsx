@@ -219,11 +219,11 @@ export default function QuranPlayer() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFCFC] dark:bg-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-[#FCFCFC] to-green-50/30 dark:from-gray-950 dark:to-green-950/30">
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-green-200/30 to-emerald-200/30 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-emerald-200/30 to-green-200/30 dark:from-emerald-900/30 dark:to-green-900/30 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2 animate-pulse" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-green-200/20 to-emerald-200/20 dark:from-green-900/20 dark:to-emerald-900/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-emerald-200/20 to-green-200/20 dark:from-emerald-900/20 dark:to-green-900/20 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2 animate-pulse" />
       </div>
 
       <div className="container relative mx-auto py-8 px-4 max-w-7xl">
@@ -249,7 +249,7 @@ export default function QuranPlayer() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="lg:col-span-4"
           >
-            <Card className="p-6 md:p-8 shadow-lg border-green-100 dark:border-green-900 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
+            <Card className="p-6 md:p-8 shadow-lg border border-green-100/20 dark:border-green-800/20 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 dark:from-green-200 dark:to-green-400 text-transparent bg-clip-text">
                   Surahs
@@ -258,7 +258,7 @@ export default function QuranPlayer() {
                   <motion.span 
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
-                    className="px-4 py-2 rounded-full bg-green-100/80 dark:bg-green-900/80 text-sm font-medium text-green-800 dark:text-green-200"
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-100/80 to-emerald-100/80 dark:from-green-900/80 dark:to-emerald-900/80 text-sm font-medium text-green-800 dark:text-green-200"
                   >
                     {surahs.length} Chapters
                   </motion.span>
@@ -309,7 +309,7 @@ export default function QuranPlayer() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="lg:col-span-8 space-y-6"
           >
-            <Card className="p-8 shadow-lg border-green-100 dark:border-green-900 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
+            <Card className="p-8 shadow-lg border border-green-100/20 dark:border-green-800/20 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
               {isLoading ? (
                 <motion.div 
                   initial={{ opacity: 0 }}
@@ -527,7 +527,7 @@ export default function QuranPlayer() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <Card className="p-6 md:p-8 shadow-lg border-green-100 dark:border-green-900 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
+                <Card className="p-6 md:p-8 shadow-lg border border-green-100/20 dark:border-green-800/20 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
                   <div className="flex flex-col items-center gap-6">
                     {/* Continuous Play Toggle */}
                     <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/50 dark:to-emerald-900/50 px-6 py-3 rounded-full">
