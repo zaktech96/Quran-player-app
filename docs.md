@@ -1,4 +1,4 @@
-# Quran Player App Documentation
+git # Quran Player App Documentation
 
 ## Project Overview
 The Quran Player App is a modern web application built with Next.js that provides an interactive platform for reading and listening to the Quran. It features a clean, accessible interface with support for multiple reciters and translations.
