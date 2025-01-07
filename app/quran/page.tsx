@@ -215,58 +215,58 @@ export default function QuranPlayer() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-100/40 via-background to-background">
+    <div className="min-h-screen bg-[#FCFCFC] dark:bg-gray-950">
       {/* Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-200/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-green-200/20 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-200/20 dark:bg-green-900/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-green-200/20 dark:bg-green-900/20 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div className="container relative mx-auto py-16 px-4 max-w-7xl">
-        <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-green-800 to-green-600 text-transparent bg-clip-text">
-            Quran Player
+      <div className="container relative mx-auto py-8 px-4 max-w-7xl">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-b from-green-800 via-green-700 to-green-600 dark:from-green-200 dark:via-green-300 dark:to-green-400 text-transparent bg-clip-text">
+            Digital Quran Player
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Experience the divine words of the Quran through beautiful recitation and reflection
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Experience the divine words through beautiful recitation and reflection
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Enhanced Surah List */}
-          <Card className="lg:col-span-4 p-8 shadow-2xl border-green-800/10 backdrop-blur-sm bg-white/90 rounded-2xl">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-green-800 to-green-600 text-transparent bg-clip-text">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Surah List */}
+          <Card className="lg:col-span-4 p-6 md:p-8 shadow-lg border-green-100 dark:border-green-900 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 dark:from-green-200 dark:to-green-400 text-transparent bg-clip-text">
                 Surahs
               </h2>
               {currentSurah && (
-                <span className="text-sm font-medium px-4 py-2 rounded-full bg-green-100 text-green-800">
+                <span className="px-4 py-2 rounded-full bg-green-100/80 dark:bg-green-900/80 text-sm font-medium text-green-800 dark:text-green-200">
                   {surahs.length} Chapters
                 </span>
               )}
             </div>
             <ScrollArea className="h-[75vh] pr-4">
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {surahs.map((surah) => (
                   <Button
                     key={surah.number}
                     variant={currentSurah?.number === surah.number ? "default" : "ghost"}
-                    className={`w-full justify-start text-left p-6 h-auto rounded-xl transition-all duration-300 ${
+                    className={`w-full justify-start text-left p-4 h-auto rounded-xl transition-all duration-300 ${
                       currentSurah?.number === surah.number 
-                      ? 'bg-green-100 text-green-800 shadow-lg' 
-                      : 'hover:bg-green-50 text-gray-700'
+                      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 shadow-md' 
+                      : 'hover:bg-green-50 dark:hover:bg-green-900/50 text-gray-700 dark:text-gray-300'
                     }`}
                     onClick={() => handleSurahSelect(surah)}
                   >
-                    <div className="flex items-center w-full">
-                      <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-green-100/50 mr-4">
-                        <span className="text-lg font-bold text-green-800">{surah.number}</span>
+                    <div className="flex items-center w-full gap-4">
+                      <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-green-100/50 dark:bg-green-900/50">
+                        <span className="text-lg font-bold text-green-800 dark:text-green-200">{surah.number}</span>
                       </div>
                       <div className="flex-1">
                         <div className="text-lg font-semibold mb-1">{surah.englishName}</div>
-                        <div className="text-sm text-gray-600 flex justify-between items-center">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 flex justify-between items-center">
                           <span>{surah.englishNameTranslation}</span>
-                          <span className="font-arabic text-base text-green-700">{surah.name}</span>
+                          <span className="font-arabic text-base text-green-700 dark:text-green-300">{surah.name}</span>
                         </div>
                       </div>
                     </div>
@@ -277,14 +277,14 @@ export default function QuranPlayer() {
           </Card>
 
           {/* Main Content */}
-          <div className="lg:col-span-8 space-y-8">
-            <Card className="p-10 shadow-2xl border-green-800/10 backdrop-blur-sm bg-white/90 rounded-2xl">
+          <div className="lg:col-span-8 space-y-6">
+            <Card className="p-8 shadow-lg border-green-100 dark:border-green-900 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl">
               {isLoading ? (
                 <div className="flex items-center justify-center h-[60vh]">
                   <div className="relative">
-                    <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-green-800"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 dark:border-green-400"></div>
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <svg className="w-10 h-10 text-green-800" fill="none" viewBox="0 0 24 24">
+                      <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                       </svg>
                     </div>
@@ -292,37 +292,36 @@ export default function QuranPlayer() {
                 </div>
               ) : currentSurah ? (
                 <div className="flex flex-col h-[75vh]">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between pb-8 border-b border-green-100">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-green-100 dark:border-green-900">
                     <div>
-                      <h2 className="text-5xl font-bold bg-gradient-to-r from-green-800 to-green-600 text-transparent bg-clip-text mb-3">
+                      <h2 className="text-4xl font-bold bg-gradient-to-r from-green-800 to-green-600 dark:from-green-200 dark:to-green-400 text-transparent bg-clip-text mb-2">
                         {currentSurah.englishName}
                       </h2>
-                      <p className="text-lg text-gray-600">
+                      <p className="text-lg text-gray-600 dark:text-gray-300">
                         {currentSurah.englishNameTranslation}
                       </p>
                     </div>
-                    <div className="mt-6 md:mt-0 text-right">
-                      <span className="text-4xl font-arabic text-green-800 block mb-2">
+                    <div className="mt-4 md:mt-0 text-right">
+                      <span className="text-3xl font-arabic text-green-800 dark:text-green-200 block mb-2">
                         {currentSurah.name}
                       </span>
-                      <span className="text-sm font-medium px-4 py-2 rounded-full bg-green-100 text-green-800">
+                      <span className="px-4 py-2 rounded-full bg-green-100/80 dark:bg-green-900/80 text-sm font-medium text-green-800 dark:text-green-200">
                         {currentSurah.revelationType} • {currentSurah.numberOfAyahs} Verses
                       </span>
                     </div>
                   </div>
 
-                  {/* Enhanced Reciter Selection */}
+                  {/* Reciter Selection */}
                   <div className="py-4">
-                    <div className="flex items-center space-x-4 bg-green-50 p-4 rounded-xl">
-                      <label htmlFor="reciter" className="text-sm font-medium text-green-800 whitespace-nowrap">
+                    <div className="flex items-center gap-4 bg-green-50 dark:bg-green-900/50 p-4 rounded-2xl">
+                      <label htmlFor="reciter" className="text-sm font-medium text-green-800 dark:text-green-200 whitespace-nowrap">
                         Select Reciter:
                       </label>
                       <select
                         id="reciter"
                         value={selectedReciter}
                         onChange={(e) => handleReciterChange(e.target.value)}
-                        className="flex-1 rounded-lg border border-green-200 bg-white px-4 py-2 text-sm ring-offset-background 
-                          focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200"
+                        className="flex-1 rounded-xl border border-green-200 dark:border-green-800 bg-white dark:bg-gray-900 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition-all duration-200"
                       >
                         <option value="">Select a reciter</option>
                         {reciters.map((reciter) => (
@@ -335,16 +334,16 @@ export default function QuranPlayer() {
                   </div>
 
                   {/* View Toggle */}
-                  <div className="flex items-center justify-end space-x-3 py-4">
+                  <div className="flex items-center justify-end gap-3 py-4">
                     <Switch
                       checked={showFullSurah}
                       onCheckedChange={setShowFullSurah}
                       id="view-mode"
-                      className="data-[state=checked]:bg-green-600"
+                      className="data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-500"
                     />
                     <label
                       htmlFor="view-mode"
-                      className="text-sm font-medium cursor-pointer text-green-800"
+                      className="text-sm font-medium cursor-pointer text-green-800 dark:text-green-200"
                     >
                       Show Full Surah
                     </label>
@@ -362,24 +361,24 @@ export default function QuranPlayer() {
                             return (
                               <div 
                                 key={ayah.number} 
-                                className="scroll-mt-6 bg-white/80 rounded-xl p-6 shadow-sm"
+                                className="scroll-mt-6 bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm"
                                 id={`verse-${ayah.numberInSurah}`}
                               >
                                 {/* Ayah Number */}
-                                <div className="flex items-center justify-center space-x-4 opacity-70 mb-4">
-                                  <div className="h-px flex-1 bg-green-100"></div>
-                                  <div className="px-4 py-1.5 rounded-full bg-green-50 text-sm font-medium text-green-800">
+                                <div className="flex items-center justify-center gap-4 opacity-70 mb-4">
+                                  <div className="h-px flex-1 bg-green-100 dark:bg-green-900"></div>
+                                  <div className="px-4 py-1.5 rounded-full bg-green-50 dark:bg-green-900/50 text-sm font-medium text-green-800 dark:text-green-200">
                                     {ayah.numberInSurah}
                                   </div>
-                                  <div className="h-px flex-1 bg-green-100"></div>
+                                  <div className="h-px flex-1 bg-green-100 dark:bg-green-900"></div>
                                 </div>
 
                                 {/* Arabic Text */}
                                 <div 
-                                  className={`text-4xl text-right font-arabic leading-[2] tracking-[0.02em] px-8 py-6 rounded-xl cursor-pointer transition-all duration-200 ${
+                                  className={`text-3xl md:text-4xl text-right font-arabic leading-[2] tracking-[0.02em] px-8 py-6 rounded-2xl cursor-pointer transition-all duration-200 ${
                                     currentAyahIndex === index 
-                                    ? 'bg-green-100 shadow-lg border border-green-200 scale-[1.02]' 
-                                    : 'bg-green-50 hover:bg-green-100/50 hover:shadow-md hover:scale-[1.01]'
+                                    ? 'bg-green-100 dark:bg-green-900 shadow-lg border border-green-200 dark:border-green-800 scale-[1.02]' 
+                                    : 'bg-green-50 dark:bg-green-900/50 hover:bg-green-100/50 dark:hover:bg-green-900 hover:shadow-md hover:scale-[1.01]'
                                   }`}
                                   dir="rtl"
                                   lang="ar"
@@ -398,11 +397,11 @@ export default function QuranPlayer() {
                                   }}
                                 >
                                   <span className="inline-block">{displayText}</span>
-                                  <span className="inline-block mr-4 text-2xl text-green-600">﴿{ayah.numberInSurah}﴾</span>
+                                  <span className="inline-block mr-4 text-2xl text-green-600 dark:text-green-400">﴿{ayah.numberInSurah}﴾</span>
                                 </div>
 
                                 {/* Translation */}
-                                <div className="text-lg text-gray-600 leading-relaxed bg-green-50/50 p-6 rounded-lg mt-4">
+                                <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed bg-green-50/50 dark:bg-green-900/50 p-6 rounded-xl mt-4">
                                   {ayah.translation}
                                 </div>
                               </div>
@@ -410,19 +409,19 @@ export default function QuranPlayer() {
                           })}
                         </div>
                       ) : (
-                        <div className="bg-white/80 rounded-xl p-6 shadow-sm">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm">
                           {/* Single Ayah view */}
-                          <div className="flex items-center justify-center space-x-4 mb-4">
-                            <div className="h-px flex-1 bg-green-100"></div>
-                            <div className="px-4 py-2 rounded-full bg-green-50 text-sm font-medium text-green-800">
+                          <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px flex-1 bg-green-100 dark:bg-green-900"></div>
+                            <div className="px-4 py-2 rounded-full bg-green-50 dark:bg-green-900/50 text-sm font-medium text-green-800 dark:text-green-200">
                               Verse {currentAyahs[currentAyahIndex]?.numberInSurah} of {currentSurah.numberOfAyahs}
                             </div>
-                            <div className="h-px flex-1 bg-green-100"></div>
+                            <div className="h-px flex-1 bg-green-100 dark:bg-green-900"></div>
                           </div>
 
                           {/* Arabic Text */}
                           <div 
-                            className="text-4xl text-right font-arabic leading-[2] tracking-[0.02em] px-8 py-6 bg-green-50 rounded-xl"
+                            className="text-3xl md:text-4xl text-right font-arabic leading-[2] tracking-[0.02em] px-8 py-6 bg-green-50 dark:bg-green-900/50 rounded-2xl"
                             dir="rtl"
                             lang="ar"
                           >
@@ -431,11 +430,11 @@ export default function QuranPlayer() {
                                 ? currentAyahs[currentAyahIndex]?.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
                                 : currentAyahs[currentAyahIndex]?.text}
                             </span>
-                            <span className="inline-block mr-4 text-2xl text-green-600">﴿{currentAyahs[currentAyahIndex]?.numberInSurah}﴾</span>
+                            <span className="inline-block mr-4 text-2xl text-green-600 dark:text-green-400">﴿{currentAyahs[currentAyahIndex]?.numberInSurah}﴾</span>
                           </div>
 
                           {/* Translation */}
-                          <div className="text-lg text-gray-600 leading-relaxed bg-green-50/50 p-6 rounded-lg mt-4">
+                          <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed bg-green-50/50 dark:bg-green-900/50 p-6 rounded-xl mt-4">
                             {currentAyahs[currentAyahIndex]?.translation}
                           </div>
                         </div>
@@ -445,46 +444,46 @@ export default function QuranPlayer() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
-                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                    <svg className="w-10 h-10 text-green-800" fill="none" viewBox="0 0 24 24">
+                  <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center mb-4">
+                    <svg className="w-10 h-10 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24">
                       <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-semibold text-green-800">Begin Your Journey</h3>
-                  <p className="text-gray-600 max-w-md">
+                  <h3 className="text-2xl font-semibold text-green-800 dark:text-green-200">Begin Your Journey</h3>
+                  <p className="text-gray-600 dark:text-gray-300 max-w-md">
                     Select a surah from the list to start reading and listening to the Quran
                   </p>
                 </div>
               )}
             </Card>
 
-            {/* Enhanced Audio Player */}
+            {/* Audio Player */}
             {currentSurah && (
-              <Card className="p-8 shadow-2xl border-green-800/10 backdrop-blur-sm bg-white/90 rounded-2xl">
-                <div className="flex flex-col items-center space-y-8">
+              <Card className="p-6 md:p-8 shadow-lg border-green-100 dark:border-green-900 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl">
+                <div className="flex flex-col items-center gap-6">
                   {/* Continuous Play Toggle */}
-                  <div className="flex items-center space-x-3 bg-green-50 px-6 py-3 rounded-full">
+                  <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/50 px-6 py-3 rounded-full">
                     <Switch
                       checked={isContinuousPlay}
                       onCheckedChange={setIsContinuousPlay}
                       id="continuous-play"
-                      className="data-[state=checked]:bg-green-600"
+                      className="data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-500"
                     />
                     <label
                       htmlFor="continuous-play"
-                      className="text-sm font-medium cursor-pointer text-green-800"
+                      className="text-sm font-medium cursor-pointer text-green-800 dark:text-green-200"
                     >
                       Continuous Play
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-center space-x-8">
+                  <div className="flex items-center justify-center gap-6">
                     <Button 
                       variant="outline" 
                       size="icon"
                       onClick={playPreviousAyah}
                       disabled={currentAyahIndex === 0}
-                      className="w-14 h-14 rounded-full hover:bg-green-50 transition-colors duration-200 border-green-200"
+                      className="w-12 h-12 rounded-full hover:bg-green-50 dark:hover:bg-green-900/50 transition-colors duration-200 border-green-200 dark:border-green-800"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -505,7 +504,7 @@ export default function QuranPlayer() {
                       <Button 
                         size="icon" 
                         onClick={pauseAudio}
-                        className="w-20 h-20 rounded-full bg-green-600 hover:bg-green-700 transition-colors duration-200 shadow-lg"
+                        className="w-16 h-16 rounded-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors duration-200 shadow-lg"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -525,7 +524,7 @@ export default function QuranPlayer() {
                       <Button 
                         size="icon" 
                         onClick={playAudio}
-                        className="w-20 h-20 rounded-full bg-green-600 hover:bg-green-700 transition-colors duration-200 shadow-lg"
+                        className="w-16 h-16 rounded-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors duration-200 shadow-lg"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -547,7 +546,7 @@ export default function QuranPlayer() {
                       size="icon" 
                       onClick={playNextAyah}
                       disabled={currentAyahIndex === currentAyahs.length - 1}
-                      className="w-14 h-14 rounded-full hover:bg-green-50 transition-colors duration-200 border-green-200"
+                      className="w-12 h-12 rounded-full hover:bg-green-50 dark:hover:bg-green-900/50 transition-colors duration-200 border-green-200 dark:border-green-800"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -568,7 +567,7 @@ export default function QuranPlayer() {
                       variant="outline" 
                       size="icon"
                       onClick={stopAudio}
-                      className="w-14 h-14 rounded-full hover:bg-green-50 transition-colors duration-200 border-green-200"
+                      className="w-12 h-12 rounded-full hover:bg-green-50 dark:hover:bg-green-900/50 transition-colors duration-200 border-green-200 dark:border-green-800"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
