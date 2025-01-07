@@ -19,18 +19,18 @@ export default function QuranPlayer() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isContinuousPlay, setIsContinuousPlay] = useState(true)
   const [showFullSurah, setShowFullSurah] = useState(false)
-  const [selectedReciter, setSelectedReciter] = useState<string>("ar.alafasy")
+  const [selectedReciter, setSelectedReciter] = useState<number | null>(null)
   const [reciters, setReciters] = useState<Reciter[]>([])
   const [isLoadingReciters, setIsLoadingReciters] = useState(true)
 
   useEffect(() => {
     const fetchReciters = async () => {
       try {
-        const response = await fetch('/api/reciters');
+        const response = await fetch('https://api.quran.com/api/v4/resources/recitations');
         const data = await response.json();
-        console.log('Fetched reciters:', data); // Debug log
-        if (Array.isArray(data)) {
-          setReciters(data);
+        if (data.recitations) {
+          setReciters(data.recitations);
+          setIsLoadingReciters(false);
         }
       } catch (error) {
         console.error('Error fetching reciters:', error);
@@ -87,6 +87,10 @@ export default function QuranPlayer() {
     };
   }, []);
 
+  const getAudioUrl = (reciterId: number, chapterNumber: number) => {
+    return `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${chapterNumber}`;
+  };
+
   const handleSurahSelect = async (surah: Surah) => {
     try {
       setIsLoading(true);
@@ -95,17 +99,14 @@ export default function QuranPlayer() {
       if (ayahs.length > 0) {
         setCurrentAyahs(ayahs);
         setCurrentAyahIndex(0);
-        if (audioRef) {
+        if (audioRef && selectedReciter !== null) {
           audioRef.pause();
           setIsPlaying(false);
-          const newAudioUrl = getAudioUrl(ayahs[0].number, selectedReciter);
           try {
-            const response = await fetch(newAudioUrl);
-            if (response.ok) {
-              const audioData = await response.json();
-              audioRef.src = audioData.audio_file.url;
-              await audioRef.load();
-            }
+            const response = await fetch(getAudioUrl(selectedReciter, surah.number));
+            const data = await response.json();
+            audioRef.src = data.audio_file.audio_url;
+            await audioRef.load();
           } catch (error) {
             console.error('Error loading audio:', error);
           }
@@ -119,10 +120,16 @@ export default function QuranPlayer() {
   };
 
   const playAudio = async () => {
-    if (audioRef && currentAyahs[currentAyahIndex]) {
+    if (audioRef && currentSurah && selectedReciter !== null) {
       try {
-        await audioRef.play();
-        setIsPlaying(true);
+        const response = await fetch(getAudioUrl(selectedReciter, currentSurah.number));
+        if (response.ok) {
+          const data = await response.json();
+          audioRef.src = data.audio_file.audio_url;
+          await audioRef.load();
+          await audioRef.play();
+          setIsPlaying(true);
+        }
       } catch (error) {
         console.error('Error playing audio:', error);
       }
@@ -145,12 +152,12 @@ export default function QuranPlayer() {
   };
 
   const playNextAyah = async () => {
-    if (currentAyahIndex < currentAyahs.length - 1) {
+    if (currentAyahIndex < currentAyahs.length - 1 && selectedReciter !== null) {
       const nextIndex = currentAyahIndex + 1;
       setCurrentAyahIndex(nextIndex);
       if (audioRef) {
         try {
-          const newAudioUrl = getAudioUrl(currentAyahs[nextIndex].number, selectedReciter);
+          const newAudioUrl = getAudioUrl(selectedReciter, currentAyahs[nextIndex].number);
           const response = await fetch(newAudioUrl);
           if (response.ok) {
             const data = await response.json();
@@ -167,12 +174,12 @@ export default function QuranPlayer() {
   };
 
   const playPreviousAyah = async () => {
-    if (currentAyahIndex > 0) {
+    if (currentAyahIndex > 0 && selectedReciter !== null) {
       const prevIndex = currentAyahIndex - 1;
       setCurrentAyahIndex(prevIndex);
       if (audioRef) {
         try {
-          const response = await fetch(getAudioUrl(currentAyahs[prevIndex].number, selectedReciter));
+          const response = await fetch(getAudioUrl(selectedReciter, currentAyahs[prevIndex].number));
           if (response.ok) {
             const data = await response.json();
             audioRef.src = data.audio_file.url;
@@ -187,33 +194,20 @@ export default function QuranPlayer() {
     }
   };
 
-  const getAudioUrl = (ayahNumber: number, reciterId: string) => {
-    // Using Quran.com API v4 for audio recitations
-    const surahNumber = currentSurah?.number;
-    const ayahInSurah = currentAyahs[currentAyahIndex]?.numberInSurah;
-    
-    return `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${surahNumber}/${ayahInSurah}`;
-  };
-
   const handleReciterChange = async (reciterId: string) => {
-    setSelectedReciter(reciterId);
-    if (audioRef && currentAyahs[currentAyahIndex]) {
-      const newAudioUrl = getAudioUrl(currentAyahs[currentAyahIndex].number, reciterId);
-      
+    const numericId = parseInt(reciterId, 10);
+    setSelectedReciter(numericId);
+    if (audioRef && currentSurah) {
       try {
-        const response = await fetch(newAudioUrl);
+        const response = await fetch(getAudioUrl(numericId, currentSurah.number));
         if (response.ok) {
           const data = await response.json();
-          // Update audio source with the audio URL from the API response
-          const audioUrl = data.audio_file.url;
-          audioRef.src = audioUrl;
-          audioRef.load();
+          audioRef.src = data.audio_file.audio_url;
+          await audioRef.load();
           setIsPlaying(false);
-        } else {
-          console.error('Failed to fetch audio URL:', newAudioUrl);
         }
       } catch (error) {
-        console.error('Error fetching audio:', error);
+        console.error('Error loading audio for reciter:', error);
       }
     }
   };
@@ -363,14 +357,14 @@ export default function QuranPlayer() {
                       </label>
                       <select
                         id="reciter"
-                        value={selectedReciter}
+                        value={selectedReciter || ""}
                         onChange={(e) => handleReciterChange(e.target.value)}
                         className="flex-1 rounded-xl border border-green-200 dark:border-green-800 bg-white dark:bg-gray-900 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition-all duration-200"
                       >
                         <option value="">Select a reciter</option>
                         {reciters.map((reciter) => (
                           <option key={reciter.id} value={reciter.id}>
-                            {reciter.name} ({reciter.arabicName})
+                            {reciter.reciter_name} ({reciter.style})
                           </option>
                         ))}
                       </select>
@@ -437,8 +431,8 @@ export default function QuranPlayer() {
                                   lang="ar"
                                   onClick={() => {
                                     setCurrentAyahIndex(index)
-                                    if (audioRef) {
-                                      const newAudioUrl = getAudioUrl(ayah.number, selectedReciter)
+                                    if (audioRef && selectedReciter !== null) {
+                                      const newAudioUrl = getAudioUrl(selectedReciter, ayah.number)
                                       audioRef.src = newAudioUrl
                                       audioRef.load()
                                       setIsPlaying(false)
@@ -529,136 +523,145 @@ export default function QuranPlayer() {
               >
                 <Card className="p-6 md:p-8 shadow-lg border border-green-100/20 dark:border-green-800/20 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
                   <div className="flex flex-col items-center gap-6">
-                    {/* Continuous Play Toggle */}
-                    <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/50 dark:to-emerald-900/50 px-6 py-3 rounded-full">
-                      <Switch
-                        checked={isContinuousPlay}
-                        onCheckedChange={setIsContinuousPlay}
-                        id="continuous-play"
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-green-600 data-[state=checked]:to-emerald-600 dark:data-[state=checked]:from-green-500 dark:data-[state=checked]:to-emerald-500"
-                      />
-                      <label
-                        htmlFor="continuous-play"
-                        className="text-sm font-medium cursor-pointer text-green-800 dark:text-green-200"
-                      >
-                        Continuous Play
-                      </label>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-6">
-                      <motion.div whileHover={{ scale: 1.1 }}>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          onClick={playPreviousAyah}
-                          disabled={currentAyahIndex === 0}
-                          className="w-12 h-12 rounded-full hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all duration-200 border-green-200 dark:border-green-800"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
+                    {selectedReciter ? (
+                      <>
+                        {/* Continuous Play Toggle */}
+                        <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/50 dark:to-emerald-900/50 px-6 py-3 rounded-full">
+                          <Switch
+                            checked={isContinuousPlay}
+                            onCheckedChange={setIsContinuousPlay}
+                            id="continuous-play"
+                            className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-green-600 data-[state=checked]:to-emerald-600 dark:data-[state=checked]:from-green-500 dark:data-[state=checked]:to-emerald-500"
+                          />
+                          <label
+                            htmlFor="continuous-play"
+                            className="text-sm font-medium cursor-pointer text-green-800 dark:text-green-200"
                           >
-                            <polygon points="19 20 9 12 19 4 19 20"></polygon>
-                            <line x1="5" y1="19" x2="5" y2="5"></line>
-                          </svg>
-                        </Button>
-                      </motion.div>
+                            Continuous Play
+                          </label>
+                        </div>
 
-                      <motion.div whileHover={{ scale: 1.1 }}>
-                        {isPlaying ? (
-                          <Button 
-                            size="icon" 
-                            onClick={pauseAudio}
-                            className="w-16 h-16 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 dark:from-green-500 dark:to-emerald-500 dark:hover:from-green-600 dark:hover:to-emerald-600 transition-all duration-200 shadow-lg"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-8 w-8"
+                        <div className="flex items-center justify-center gap-6">
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            <Button 
+                              variant="outline" 
+                              size="icon"
+                              onClick={playPreviousAyah}
+                              disabled={currentAyahIndex === 0}
+                              className="w-12 h-12 rounded-full hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all duration-200 border-green-200 dark:border-green-800"
                             >
-                              <rect x="6" y="4" width="4" height="16"></rect>
-                              <rect x="14" y="4" width="4" height="16"></rect>
-                            </svg>
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="icon" 
-                            onClick={playAudio}
-                            className="w-16 h-16 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 dark:from-green-500 dark:to-emerald-500 dark:hover:from-green-600 dark:hover:to-emerald-600 transition-all duration-200 shadow-lg"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-8 w-8"
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-6 w-6"
+                              >
+                                <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                                <line x1="5" y1="19" x2="5" y2="5"></line>
+                              </svg>
+                            </Button>
+                          </motion.div>
+
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            {isPlaying ? (
+                              <Button 
+                                size="icon" 
+                                onClick={pauseAudio}
+                                className="w-16 h-16 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 dark:from-green-500 dark:to-emerald-500 dark:hover:from-green-600 dark:hover:to-emerald-600 transition-all duration-200 shadow-lg"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="h-8 w-8"
+                                >
+                                  <rect x="6" y="4" width="4" height="16"></rect>
+                                  <rect x="14" y="4" width="4" height="16"></rect>
+                                </svg>
+                              </Button>
+                            ) : (
+                              <Button 
+                                size="icon" 
+                                onClick={playAudio}
+                                className="w-16 h-16 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 dark:from-green-500 dark:to-emerald-500 dark:hover:from-green-600 dark:hover:to-emerald-600 transition-all duration-200 shadow-lg"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="h-8 w-8"
+                                >
+                                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                              </Button>
+                            )}
+                          </motion.div>
+
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              onClick={playNextAyah}
+                              disabled={currentAyahIndex === currentAyahs.length - 1}
+                              className="w-12 h-12 rounded-full hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all duration-200 border-green-200 dark:border-green-800"
                             >
-                              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                          </Button>
-                        )}
-                      </motion.div>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-6 w-6"
+                              >
+                                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                                <line x1="19" y1="5" x2="19" y2="19"></line>
+                              </svg>
+                            </Button>
+                          </motion.div>
 
-                      <motion.div whileHover={{ scale: 1.1 }}>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={playNextAyah}
-                          disabled={currentAyahIndex === currentAyahs.length - 1}
-                          className="w-12 h-12 rounded-full hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all duration-200 border-green-200 dark:border-green-800"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
-                          >
-                            <polygon points="5 4 15 12 5 20 5 4"></polygon>
-                            <line x1="19" y1="5" x2="19" y2="19"></line>
-                          </svg>
-                        </Button>
-                      </motion.div>
-
-                      <motion.div whileHover={{ scale: 1.1 }}>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          onClick={stopAudio}
-                          className="w-12 h-12 rounded-full hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all duration-200 border-green-200 dark:border-green-800"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
-                          >
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                          </svg>
-                        </Button>
-                      </motion.div>
-                    </div>
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            <Button 
+                              variant="outline" 
+                              size="icon"
+                              onClick={stopAudio}
+                              className="w-12 h-12 rounded-full hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all duration-200 border-green-200 dark:border-green-800"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-6 w-6"
+                              >
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              </svg>
+                            </Button>
+                          </motion.div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-4">
+                        <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">Please select a reciter to play audio</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Choose from the dropdown menu above</p>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </motion.div>

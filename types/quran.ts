@@ -24,9 +24,12 @@ export type Ayah = {
   translation: string
 }
 
-export type Reciter = {
-  id: string
-  name: string
-  arabicName: string
-  format: string
+export interface Reciter {
+  id: number;
+  reciter_name: string;
+  style: string;
+  translated_name: {
+    name: string;
+    language_name: string;
+  };
 } 
