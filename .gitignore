@@ -8,6 +8,10 @@
 # testing
 /coverage
 
+# docs
+docs.md
+TODO.md
+
 # next.js
 /.next/
 /out/

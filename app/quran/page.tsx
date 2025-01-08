@@ -9,6 +9,31 @@ import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
 
+interface AlQuranResponse {
+  code: number
+  status: string
+  data: {
+    surahs: {
+      number: number
+      name: string
+      englishName: string
+      englishNameTranslation: string
+      numberOfAyahs: number
+      revelationType: string
+      ayahs: {
+        number: number
+        text: string
+        numberInSurah: number
+        juz: number
+        manzil: number
+        page: number
+        ruku: number
+        hizbQuarter: number
+      }[]
+    }[]
+  }
+}
+
 export default function QuranPlayer() {
   const [surahs, setSurahs] = useState<Surah[]>([])
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null)
@@ -22,6 +47,9 @@ export default function QuranPlayer() {
   const [selectedReciter, setSelectedReciter] = useState<number | null>(null)
   const [reciters, setReciters] = useState<Reciter[]>([])
   const [isLoadingReciters, setIsLoadingReciters] = useState(true)
+  const [quranData, setQuranData] = useState<AlQuranResponse['data'] | null>(null)
+  const [audioSegments, setAudioSegments] = useState<{ start: number; end: number; verseIndex: number }[]>([])
+  const [verseDuration, setVerseDuration] = useState<number>(0);
 
   useEffect(() => {
     const fetchReciters = async () => {
@@ -41,23 +69,33 @@ export default function QuranPlayer() {
   }, []);
 
   useEffect(() => {
-    const loadSurahs = async () => {
+    const fetchQuranData = async () => {
       try {
         setIsLoading(true);
-        const data = await getAllSurahs();
-        if (data.length > 0) {
-          setSurahs(data);
-        } else {
-          console.error("No surahs returned");
+        const response = await fetch('http://api.alquran.cloud/v1/quran/quran-uthmani');
+        const data: AlQuranResponse = await response.json();
+        
+        if (data.status === 'OK' && data.data) {
+          setQuranData(data.data);
+          // Transform the data to match our Surah interface
+          const transformedSurahs: Surah[] = data.data.surahs.map(surah => ({
+            number: surah.number,
+            name: surah.name,
+            englishName: surah.englishName,
+            englishNameTranslation: surah.englishNameTranslation,
+            numberOfAyahs: surah.numberOfAyahs,
+            revelationType: surah.revelationType
+          }));
+          setSurahs(transformedSurahs);
         }
       } catch (error) {
-        console.error("Failed to load surahs:", error);
+        console.error("Failed to load Quran data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadSurahs();
+    fetchQuranData();
   }, []);
 
   useEffect(() => {
@@ -80,35 +118,106 @@ export default function QuranPlayer() {
   // Initialize audio element
   useEffect(() => {
     const audio = new Audio();
+    
+    const handleTimeUpdate = () => {
+      if (isContinuousPlay && audio.duration > 0) {
+        // Check if we're near the end of the current verse
+        if (audio.currentTime >= audio.duration - 0.1) {
+          playNextAyah();
+        }
+      }
+    };
+
+    const handleEnded = () => {
+      if (isContinuousPlay) {
+        playNextAyah();
+      } else {
+        setIsPlaying(false);
+      }
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
     setAudioRef(audio);
+    
     return () => {
       audio.pause();
       audio.src = '';
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [isContinuousPlay, currentAyahs.length]);
 
-  const getAudioUrl = (reciterId: number, chapterNumber: number) => {
-    return `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${chapterNumber}`;
+  const getAudioUrl = (reciterId: number, verseKey: string) => {
+    // Using everyayah.com API which provides direct MP3 files
+    const [surahNumber, ayahNumber] = verseKey.split(':');
+    const paddedSurah = surahNumber.padStart(3, '0');
+    const paddedAyah = ayahNumber.padStart(3, '0');
+    return `https://everyayah.com/data/${reciterId}/${paddedSurah}${paddedAyah}.mp3`;
+  };
+
+  const handleVerseClick = async (ayah: Ayah, index: number) => {
+    setCurrentAyahIndex(index);
+    if (audioRef && selectedReciter !== null && currentSurah) {
+      try {
+        const verseKey = `${currentSurah.number}:${ayah.numberInSurah}`;
+        const audioUrl = getAudioUrl(selectedReciter, verseKey);
+        audioRef.src = audioUrl;
+        await audioRef.load();
+        await audioRef.play();
+        setIsPlaying(true);
+        
+        // Scroll to the clicked verse
+        document.getElementById(`verse-${ayah.numberInSurah}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      } catch (error) {
+        console.error('Error playing verse audio:', error);
+      }
+    }
   };
 
   const handleSurahSelect = async (surah: Surah) => {
     try {
       setIsLoading(true);
       setCurrentSurah(surah);
-      const { ayahs } = await getSurah(surah.number);
-      if (ayahs.length > 0) {
-        setCurrentAyahs(ayahs);
-        setCurrentAyahIndex(0);
-        if (audioRef && selectedReciter !== null) {
-          audioRef.pause();
-          setIsPlaying(false);
-          try {
-            const response = await fetch(getAudioUrl(selectedReciter, surah.number));
-            const data = await response.json();
-            audioRef.src = data.audio_file.audio_url;
-            await audioRef.load();
-          } catch (error) {
-            console.error('Error loading audio:', error);
+      
+      if (quranData) {
+        const selectedSurah = quranData.surahs.find(s => s.number === surah.number);
+        if (selectedSurah) {
+          // Fetch translations
+          const translationResponse = await fetch(`http://api.alquran.cloud/v1/surah/${surah.number}/en.sahih`);
+          const translationData = await translationResponse.json();
+          
+          // Transform ayahs to match our Ayah interface
+          const transformedAyahs: Ayah[] = selectedSurah.ayahs.map((ayah, index) => ({
+            number: ayah.number,
+            text: ayah.text,
+            numberInSurah: ayah.numberInSurah,
+            translation: translationData.data.ayahs[index]?.text || '',
+            audio: '' // We'll keep the audio URL logic separate
+          }));
+          
+          setCurrentAyahs(transformedAyahs);
+          setCurrentAyahIndex(0);
+          
+          // Reset audio state
+          if (audioRef && selectedReciter !== null) {
+            audioRef.pause();
+            setIsPlaying(false);
+            try {
+              const verseKey = `${surah.number}:1`;
+              const response = await fetch(getAudioUrl(selectedReciter, verseKey));
+              const data = await response.json();
+              if (data.audio_files && data.audio_files.length > 0) {
+                audioRef.src = data.audio_files[0].url;
+                await audioRef.load();
+              }
+            } catch (error) {
+              console.error('Error loading audio:', error);
+            }
           }
         }
       }
@@ -122,14 +231,12 @@ export default function QuranPlayer() {
   const playAudio = async () => {
     if (audioRef && currentSurah && selectedReciter !== null) {
       try {
-        const response = await fetch(getAudioUrl(selectedReciter, currentSurah.number));
-        if (response.ok) {
-          const data = await response.json();
-          audioRef.src = data.audio_file.audio_url;
-          await audioRef.load();
-          await audioRef.play();
-          setIsPlaying(true);
-        }
+        const verseKey = `${currentSurah.number}:${currentAyahs[currentAyahIndex].numberInSurah}`;
+        const audioUrl = getAudioUrl(selectedReciter, verseKey);
+        audioRef.src = audioUrl;
+        await audioRef.load();
+        await audioRef.play();
+        setIsPlaying(true);
       } catch (error) {
         console.error('Error playing audio:', error);
       }
@@ -152,41 +259,50 @@ export default function QuranPlayer() {
   };
 
   const playNextAyah = async () => {
-    if (currentAyahIndex < currentAyahs.length - 1 && selectedReciter !== null) {
+    if (currentAyahIndex < currentAyahs.length - 1 && selectedReciter !== null && currentSurah) {
       const nextIndex = currentAyahIndex + 1;
       setCurrentAyahIndex(nextIndex);
       if (audioRef) {
         try {
-          const newAudioUrl = getAudioUrl(selectedReciter, currentAyahs[nextIndex].number);
-          const response = await fetch(newAudioUrl);
-          if (response.ok) {
-            const data = await response.json();
-            audioRef.src = data.audio_file.url;
-            await audioRef.load();
-            await audioRef.play();
-            setIsPlaying(true);
-          }
+          const verseKey = `${currentSurah.number}:${currentAyahs[nextIndex].numberInSurah}`;
+          const audioUrl = getAudioUrl(selectedReciter, verseKey);
+          audioRef.src = audioUrl;
+          await audioRef.load();
+          await audioRef.play();
+          setIsPlaying(true);
+          
+          // Scroll to the next verse
+          document.getElementById(`verse-${currentAyahs[nextIndex].numberInSurah}`)?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
         } catch (error) {
           console.error('Error playing next ayah:', error);
         }
       }
+    } else {
+      setIsPlaying(false);
     }
   };
 
   const playPreviousAyah = async () => {
-    if (currentAyahIndex > 0 && selectedReciter !== null) {
+    if (currentAyahIndex > 0 && selectedReciter !== null && currentSurah) {
       const prevIndex = currentAyahIndex - 1;
       setCurrentAyahIndex(prevIndex);
       if (audioRef) {
         try {
-          const response = await fetch(getAudioUrl(selectedReciter, currentAyahs[prevIndex].number));
-          if (response.ok) {
-            const data = await response.json();
-            audioRef.src = data.audio_file.url;
-            await audioRef.load();
-            await audioRef.play();
-            setIsPlaying(true);
-          }
+          const verseKey = `${currentSurah.number}:${currentAyahs[prevIndex].numberInSurah}`;
+          const audioUrl = getAudioUrl(selectedReciter, verseKey);
+          audioRef.src = audioUrl;
+          await audioRef.load();
+          await audioRef.play();
+          setIsPlaying(true);
+          
+          // Scroll to the previous verse
+          document.getElementById(`verse-${currentAyahs[prevIndex].numberInSurah}`)?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
         } catch (error) {
           console.error('Error playing previous ayah:', error);
         }
@@ -197,15 +313,13 @@ export default function QuranPlayer() {
   const handleReciterChange = async (reciterId: string) => {
     const numericId = parseInt(reciterId, 10);
     setSelectedReciter(numericId);
-    if (audioRef && currentSurah) {
+    if (audioRef && currentSurah && currentAyahs.length > 0) {
       try {
-        const response = await fetch(getAudioUrl(numericId, currentSurah.number));
-        if (response.ok) {
-          const data = await response.json();
-          audioRef.src = data.audio_file.audio_url;
-          await audioRef.load();
-          setIsPlaying(false);
-        }
+        const verseKey = `${currentSurah.number}:${currentAyahs[currentAyahIndex].numberInSurah}`;
+        const audioUrl = getAudioUrl(numericId, verseKey);
+        audioRef.src = audioUrl;
+        await audioRef.load();
+        setIsPlaying(false);
       } catch (error) {
         console.error('Error loading audio for reciter:', error);
       }
@@ -397,9 +511,7 @@ export default function QuranPlayer() {
                       {showFullSurah ? (
                         <div className="space-y-6">
                           {currentAyahs.map((ayah, index) => {
-                            const displayText = index === 0 
-                              ? ayah.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
-                              : ayah.text;
+                            const displayText = ayah.text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '');
 
                             return (
                               <motion.div
@@ -429,19 +541,7 @@ export default function QuranPlayer() {
                                   }`}
                                   dir="rtl"
                                   lang="ar"
-                                  onClick={() => {
-                                    setCurrentAyahIndex(index)
-                                    if (audioRef && selectedReciter !== null) {
-                                      const newAudioUrl = getAudioUrl(selectedReciter, ayah.number)
-                                      audioRef.src = newAudioUrl
-                                      audioRef.load()
-                                      setIsPlaying(false)
-                                    }
-                                    document.getElementById(`verse-${ayah.numberInSurah}`)?.scrollIntoView({
-                                      behavior: 'smooth',
-                                      block: 'center'
-                                    })
-                                  }}
+                                  onClick={() => handleVerseClick(ayah, index)}
                                 >
                                   <span className="inline-block">{displayText}</span>
                                   <span className="absolute bottom-2 left-4 text-xl text-green-600/75 dark:text-green-400/75">﴿{ayah.numberInSurah}﴾</span>
@@ -449,7 +549,7 @@ export default function QuranPlayer() {
 
                                 {/* Enhanced Translation */}
                                 <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-transparent dark:from-green-900/30 dark:via-emerald-900/20 dark:to-transparent p-8 rounded-2xl mt-6 border border-green-100/10 dark:border-green-800/10">
-                                  {ayah.translation}
+                                  {ayah.translation.replace(/^In the name of Allah, the Entirely Merciful, the Especially Merciful\s*/, '')}
                                 </div>
                               </motion.div>
                             );
