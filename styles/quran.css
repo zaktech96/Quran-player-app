@@ -1,0 +1,78 @@
+/* Container for the entire Quran page */
+.quran-container {
+  display: grid;
+  gap: 2rem;
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Grid layout that adapts to screen size */
+.quran-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Surah card styling */
+.surah-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.surah-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Responsive text sizing */
+.arabic-text {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.6;
+  text-align: right;
+  margin-bottom: 1rem;
+}
+
+.translation-text {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.6;
+}
+
+/* Controls section */
+.quran-controls {
+  position: sticky;
+  top: 0;
+  background: var(--bg-color);
+  padding: 1rem;
+  z-index: 10;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Audio player styling */
+.audio-player {
+  width: 100%;
+  max-width: 500px;
+  margin: 1rem auto;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .quran-container {
+    padding: 0.5rem;
+  }
+
+  .quran-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .surah-card {
+    padding: 1rem;
+  }
+}
