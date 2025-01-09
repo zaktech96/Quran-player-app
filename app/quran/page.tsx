@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { getAllSurahs, getSurah } from "@/lib/quran"
+import { getAllSurahs, getSurah, getAyah } from "@/lib/quran"
 import { Surah, Ayah, Reciter } from "@/types/quran"
 import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
@@ -212,6 +212,22 @@ export default function QuranPlayer() {
     }
   };
 
+  const handleAyahSelect = async (surahNo: number, ayahNo: number) => {
+    try {
+      const ayah = await getAyah(surahNo, ayahNo);
+      if (ayah) {
+        setCurrentAyahIndex(ayahNo - 1);
+        setCurrentAyahs(prev => {
+          const newAyahs = [...prev];
+          newAyahs[ayahNo - 1] = ayah;
+          return newAyahs;
+        });
+      }
+    } catch (error) {
+      console.error('Error loading ayah:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FCFCFC] to-green-50/30 dark:from-gray-950 dark:to-green-950/30">
       {/* Enhanced Background Effects */}
@@ -391,6 +407,17 @@ export default function QuranPlayer() {
                       Show Full Surah
                     </label>
                   </motion.div>
+
+                  {currentSurah && currentSurah.number !== 9 && currentSurah.number !== 1 && (
+                    <motion.div className="text-center mb-8">
+                      <div className="text-3xl font-arabic mb-2">
+                        بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                      </div>
+                      <div className="text-gray-600 dark:text-gray-300">
+                        In the name of Allah, the Entirely Merciful, the Especially Merciful
+                      </div>
+                    </motion.div>
+                  )}
 
                   <ScrollArea className="flex-grow">
                     <div className="space-y-6">

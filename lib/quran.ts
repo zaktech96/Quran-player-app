@@ -50,38 +50,66 @@ export async function getSurah(
 ): Promise<{
   ayahs: Ayah[],
   edition?: QuranEdition,
-  translation?: QuranEdition
+  translation?: QuranEdition,
+  bismillah?: { arabic: string; translation: string }
 }> {
   try {
-    // Always use Uthmani script for Arabic text
     const arabicEdition = DEFAULT_EDITIONS.ARABIC
     const translationEdition = options.translation || DEFAULT_EDITIONS.ENGLISH
 
-    // Get Arabic text from Uthmani script
     const arabicResponse = await fetch(`${API_BASE_URL}/quran/${arabicEdition}`)
     const arabicData = await arabicResponse.json()
     const surahData = arabicData.data.surahs[number - 1]
 
-    // Get translation
     const translationResponse = await fetch(`${API_BASE_URL}/surah/${number}/${translationEdition}`)
     const translationData = await translationResponse.json()
 
-    // Get edition information
     const [editionInfo, translationInfo] = await Promise.all([
       getEditionInfo(arabicEdition),
       getEditionInfo(translationEdition)
     ])
 
-    // Process the ayahs directly from the API without any modifications
-    const ayahs = surahData.ayahs.map((ayah: any, index: number) => ({
-      number: ayah.number,
-      numberInSurah: ayah.numberInSurah,
-      text: ayah.text,
-      translation: translationData.data.ayahs[index].text
-    }))
+    // Handle Bismillah separately
+    let bismillah;
+    if (number !== 1 && number !== 9) {
+      bismillah = {
+        arabic: "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+        translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful"
+      };
+    }
+
+    const ayahs = surahData.ayahs.map((ayah: any, index: number) => {
+      let text = ayah.text;
+      let translation = translationData.data.ayahs[index].text;
+
+      // Remove Bismillah from first ayah of ALL surahs except Al-Fatiha (1)
+      if (ayah.numberInSurah === 1) {
+        if (number === 1) {
+          // For Al-Fatiha, keep Bismillah as it's the first verse
+          return {
+            number: ayah.number,
+            numberInSurah: ayah.numberInSurah,
+            text,
+            translation
+          };
+        } else {
+          // For all other surahs, remove Bismillah from first verse
+          text = text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '');
+          translation = translation.replace(/^In the name of Allah, .+?\. /, '');
+        }
+      }
+
+      return {
+        number: ayah.number,
+        numberInSurah: ayah.numberInSurah,
+        text,
+        translation
+      };
+    });
 
     return { 
       ayahs,
+      bismillah,
       edition: editionInfo,
       translation: translationInfo
     }
@@ -95,4 +123,47 @@ export async function getSurah(
 async function getEditionInfo(identifier: string): Promise<QuranEdition | undefined> {
   const editions = await getAvailableEditions()
   return editions.find(edition => edition.identifier === identifier)
+}
+
+interface VerseTimings {
+  timestampFrom: number;
+  timestampTo: number;
+  duration: number;
+  verseNumber: number;
+}
+
+export async function getVerseTimings(surahNumber: number, reciterId: number): Promise<VerseTimings[]> {
+  try {
+    const response = await fetch(`https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${surahNumber}/timings`);
+    const data = await response.json();
+    return data.verse_timings.map((timing: any) => ({
+      timestampFrom: timing.timestamp_from,
+      timestampTo: timing.timestamp_to,
+      duration: timing.duration,
+      verseNumber: timing.verse_key.split(':')[1]
+    }));
+  } catch (error) {
+    console.error('Error fetching verse timings:', error);
+    return [];
+  }
+}
+
+export async function getAyah(surahNo: number, ayahNo: number): Promise<Ayah | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/ayah/${surahNo}:${ayahNo}/en.asad`);
+    const data = await response.json();
+    
+    if (data.code === 200) {
+      return {
+        number: data.data.number,
+        text: data.data.text,
+        numberInSurah: data.data.numberInSurah,
+        translation: data.data.translation
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching ayah:', error);
+    return null;
+  }
 }

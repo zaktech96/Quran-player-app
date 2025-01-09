@@ -5,13 +5,19 @@ import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
 interface CustomVideoPlayerProps {
   videoSrc: string;
   onTimeUpdate?: (currentTime: number) => void;
-  timestamps?: { time: number; verseId: string | number }[];
+  timestamps: { time: number; verseId: string | number }[];
+  onVerseEnd?: () => void;
+  isContinuousPlay?: boolean;
+  currentVerseId?: string | number;
 }
 
 export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ 
   videoSrc, 
   onTimeUpdate,
-  timestamps = [] 
+  timestamps,
+  onVerseEnd,
+  isContinuousPlay = false,
+  currentVerseId
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -32,25 +38,33 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({
 
     const updateProgress = () => {
       if (video.duration > 0) {
-        setProgress((video.currentTime / video.duration) * 100);
-        onTimeUpdate?.(video.currentTime);
+        const currentTime = video.currentTime;
+        setProgress((currentTime / video.duration) * 100);
+        onTimeUpdate?.(currentTime);
+
+        // Find the current verse based on timestamps
+        const currentVerse = timestamps
+          .slice()
+          .reverse()
+          .find(t => currentTime >= t.time);
+
+        // If we're in a new verse, trigger verse change
+        if (currentVerse && currentVerse.verseId !== currentVerseId) {
+          console.log('Changing to verse:', currentVerse.verseId, 'at time:', currentTime);
+          onVerseEnd?.();
+        }
       }
     };
 
-    const handleVideoEnd = () => setIsPlaying(false);
-
+    // Check more frequently for precise verse changes
+    const checkInterval = setInterval(updateProgress, 100);
     video.addEventListener('timeupdate', updateProgress);
-    video.addEventListener('ended', handleVideoEnd);
-
-    if (autoplay) {
-      video.play().catch((error) => console.error('Autoplay failed:', error));
-    }
 
     return () => {
       video.removeEventListener('timeupdate', updateProgress);
-      video.removeEventListener('ended', handleVideoEnd);
+      clearInterval(checkInterval);
     };
-  }, [autoplay, onTimeUpdate]);
+  }, [onTimeUpdate, timestamps, currentVerseId, onVerseEnd]);
 
   useEffect(() => {
     const handleMouseMove = () => {
@@ -155,6 +169,24 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({
       document.exitFullscreen();
     }
   }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    // Reset video and wait for source to load before playing
+    const handleLoadedData = () => {
+      if (isPlaying) {
+        video.play().catch(console.error);
+      }
+    };
+
+    video.addEventListener('loadeddata', handleLoadedData);
+    
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+    };
+  }, [videoSrc, isPlaying]);
 
   return (
     <div

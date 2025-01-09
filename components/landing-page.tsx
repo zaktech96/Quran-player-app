@@ -6,8 +6,26 @@ import { motion } from "framer-motion";
 import { BookOpen, Headphones, Globe, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { VideoPlayer } from '@/components/video-player';
+import { useState } from 'react';
+
+// Example timestamps for verses (you'll need to adjust these based on your audio)
+const verses = [
+  { time: 0, verseId: 1 },
+  { time: 5, verseId: 2 },
+  { time: 10, verseId: 3 },
+];
 
 export function LandingPage() {
+  const [currentVerseId, setCurrentVerseId] = useState(1);
+
+  const handleVerseEnd = () => {
+    const currentIndex = verses.findIndex(v => v.verseId === currentVerseId);
+    if (currentIndex < verses.length - 1) {
+      setCurrentVerseId(verses[currentIndex + 1].verseId);
+    }
+  };
+
   const features = [
     {
       title: "Read Quran",
@@ -260,6 +278,13 @@ export function LandingPage() {
           </div>
         </section>
       </main>
+      <VideoPlayer 
+        videoSrc="/path/to/your/audio.mp3"
+        timestamps={verses}
+        currentVerseId={currentVerseId}
+        onVerseEnd={handleVerseEnd}
+        isContinuousPlay={true}
+      />
     </div>
   );
 }
