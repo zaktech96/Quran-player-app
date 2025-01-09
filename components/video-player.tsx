@@ -4,9 +4,15 @@ import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
 
 interface CustomVideoPlayerProps {
   videoSrc: string;
+  onTimeUpdate?: (currentTime: number) => void;
+  timestamps?: { time: number; verseId: string | number }[];
 }
 
-export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ videoSrc }) => {
+export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ 
+  videoSrc, 
+  onTimeUpdate,
+  timestamps = [] 
+}) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [volume, setVolume] = useState<number>(1);
@@ -27,6 +33,7 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ videoSrc }) => {
     const updateProgress = () => {
       if (video.duration > 0) {
         setProgress((video.currentTime / video.duration) * 100);
+        onTimeUpdate?.(video.currentTime);
       }
     };
 
@@ -43,7 +50,7 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ videoSrc }) => {
       video.removeEventListener('timeupdate', updateProgress);
       video.removeEventListener('ended', handleVideoEnd);
     };
-  }, [autoplay]);
+  }, [autoplay, onTimeUpdate]);
 
   useEffect(() => {
     const handleMouseMove = () => {
@@ -98,6 +105,12 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ videoSrc }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = volume;
+    }
+  }, [volume]);
+
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
     videoRef.current[isPlaying ? 'pause' : 'play']();
@@ -113,10 +126,17 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({ videoSrc }) => {
 
   const toggleMute = useCallback(() => {
     if (!videoRef.current) return;
+    if (isMuted) {
+      videoRef.current.volume = currentVolume;
+      setVolume(currentVolume);
+    } else {
+      setCurrentVolume(volume);
+      videoRef.current.volume = 0;
+      setVolume(0);
+    }
     videoRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
-    setVolume(isMuted ? currentVolume : 0);
-  }, [isMuted, currentVolume]);
+  }, [isMuted, volume, currentVolume]);
 
   const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (!videoRef.current) return;
