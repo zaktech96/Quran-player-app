@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { BookOpen, Headphones, Globe, ChevronRight, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
-import { ModeToggle } from '@/components/mode-toggle';
 
 export function LandingPage() {
   const features = [
@@ -304,7 +303,6 @@ export function LandingPage() {
                   Read Quran
                 </Button>
               </Link>
-              <ModeToggle />
             </div>
           </div>
         </div>
