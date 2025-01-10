@@ -6,8 +6,8 @@ import { Card } from "@/components/ui/card"
 
 interface CustomVideoPlayerProps {
   videoSrc: string;
+  timestamps?: { time: number; verseId: string | number }[];
   onTimeUpdate?: (currentTime: number) => void;
-  timestamps: { time: number; verseId: string | number }[];
   onVerseEnd?: () => void;
   isContinuousPlay?: boolean;
   currentVerseId?: string | number;

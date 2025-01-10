@@ -29,3 +29,8 @@
 - [ ] Add offline support
 - [ ] Implement user preferences
 - [ ] Add sharing capabilities
+- [ ] Authentication & User Features (Optional)
+  - [ ] User bookmarks and preferences
+  - [ ] Reading progress tracking
+  - [ ] Favorite recitations
+  - [ ] Personal notes

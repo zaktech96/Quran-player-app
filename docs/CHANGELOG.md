@@ -63,4 +63,4 @@
 - Complete verse timing synchronization
 - Add verse bookmarking functionality
 - Implement search capabilities
-- Add verse sharing features 
+- Add verse sharing features
