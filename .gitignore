@@ -14,6 +14,8 @@
 
 # Documentation
 project-overview.md
+docs/TODO.md
+docs/CHANGELOG.md
 
 # production
 /build
