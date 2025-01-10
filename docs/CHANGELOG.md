@@ -30,6 +30,10 @@
   - Improved audio state management
 - Enhanced error handling for audio playback
 - Added loading states for better UX
+- Identified boilerplate structure mismatch
+  - ModeToggle component path differed from boilerplate expectations
+  - Import paths working locally but failing in production
+  - Need to align with boilerplate file structure
 
 ### 🐛 Bug Fixes
 - Fixed audio player duplicate rendering
@@ -47,7 +51,8 @@
   - Fixed import paths for better module resolution
   - Resolved 'default export' error in mode-toggle component
 - Fixed production deployment issues
-  - Removed ModeToggle component temporarily to fix build errors
+  - Completely removed ModeToggle component and related code
+  - Simplified app structure by removing unused theme functionality
   - Resolved Quran page not showing in production
   - Simplified navigation to improve reliability
 
