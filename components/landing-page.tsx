@@ -78,17 +78,16 @@ export function LandingPage() {
               </motion.div>
 
               {/* Enhanced heading with animated gradient */}
-              <h1 className="text-5xl md:text-7xl font-bold mb-8 relative">
-                <span className="bg-gradient-to-r from-green-800 via-green-600 to-emerald-600 dark:from-green-200 dark:via-green-300 dark:to-emerald-300 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-                  Experience the Holy Quran<br />
-                  with Quran Sphere
+              <h1 className="text-6xl md:text-8xl font-bold mb-10 relative tracking-tight">
+                <span className="bg-gradient-to-r from-green-800 via-green-600 to-emerald-600 dark:from-green-200 dark:via-green-300 dark:to-emerald-300 bg-clip-text text-transparent animate-gradient">
+                  Experience the Holy Quran
                 </span>
               </h1>
 
               {/* Updated description */}
-              <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto">
-                Immerse yourself in the divine words with Quran Sphere's beautiful recitations,
-                precise translations, and modern reading experience
+              <p className="text-2xl text-gray-600 dark:text-gray-300 mb-16 leading-relaxed max-w-2xl mx-auto">
+                Immerse yourself in the divine words with beautiful recitations
+                and modern reading experience
               </p>
 
               {/* Enhanced CTA buttons */}
@@ -96,28 +95,14 @@ export function LandingPage() {
                 <Link href="/quran">
                   <Button 
                     size="lg" 
-                    className="relative group overflow-hidden bg-green-600 hover:bg-green-700
-                      text-2xl font-medium text-white
-                      px-16 py-8 rounded-[50px]
-                      shadow-lg hover:shadow-xl 
-                      transition-all duration-300
-                      w-full sm:w-auto"
+                    className="px-16 py-10 text-2xl rounded-[50px] font-medium
+                      bg-green-600 hover:bg-green-700 transition-all duration-300
+                      shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <span>Start Reading</span>
+                    <span className="flex items-center gap-3">
+                      Start Reading
                       <ChevronRight className="w-6 h-6" />
-                    </div>
-
-                    {/* Mouse scroll indicator */}
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 transform translate-y-full">
-                      <div className="w-6 h-10 border-2 border-gray-300/50 rounded-full flex justify-center pt-2">
-                        <motion.div 
-                          className="w-1 h-2 bg-green-400 rounded-full"
-                          animate={{ y: [0, 12, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                        />
-                      </div>
-                    </div>
+                    </span>
                   </Button>
                 </Link>
               </div>
