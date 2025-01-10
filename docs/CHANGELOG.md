@@ -54,6 +54,7 @@
   - Completely removed ModeToggle component and related code
   - Simplified app structure by removing unused theme functionality
   - Removed remaining ModeToggle references from dashboard
+  - Removed ModeToggle from navbar component
   - Cleaned up unused imports across components
   - Resolved Quran page not showing in production
   - Simplified navigation to improve reliability

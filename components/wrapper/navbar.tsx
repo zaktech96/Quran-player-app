@@ -12,9 +12,6 @@ import {
 import { Menu, MoveRight, X } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
-import ModeToggle from '../mode-toggle';
-import { useAuth } from '@clerk/nextjs';
-import config from '@/config';
 import { UserProfile } from '../user-profile';
 
 export default function NavBar() {
@@ -69,12 +66,6 @@ export default function NavBar() {
       ],
     },
   ];
-
-  let userId = null;
-  if (config?.auth?.enabled) {
-    const user = useAuth();
-    userId = user?.userId;
-  }
 
   const [isOpen, setOpen] = useState(false);
 
@@ -133,7 +124,7 @@ export default function NavBar() {
           <p className="font-semibold">Titan</p>
         </div>
         <div className="flex justify-end w-full gap-4 items-center">
-          {userId ? (
+          {false ? (
             <UserProfile />
           ) : (
             <>
@@ -141,7 +132,6 @@ export default function NavBar() {
               <Button>Get started</Button>
             </>
           )}
-          <ModeToggle />
         </div>
         <div className="flex w-12 shrink lg:hidden items-end justify-end">
           <Button variant="ghost" onClick={() => setOpen(!isOpen)}>
