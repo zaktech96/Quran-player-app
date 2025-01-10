@@ -1,6 +1,8 @@
 'use client';
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react';
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
 interface CustomVideoPlayerProps {
   videoSrc: string;

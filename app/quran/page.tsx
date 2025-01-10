@@ -608,18 +608,13 @@ export default function QuranPlayer() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <Card className="backdrop-blur-md bg-white/90 dark:bg-gray-900/90 
-                      shadow-xl border border-green-100/20 dark:border-green-800/20 
-                      rounded-full hover:shadow-2xl transition-all duration-300"
-                    >
+                    <Card className="backdrop-blur-md bg-white/90 dark:bg-gray-900/90 shadow-xl border-0">
                       {/* Progress Bar */}
-                      <div className="absolute -top-3 left-4 right-4">
-                        <div className="h-1 bg-green-100 dark:bg-green-900/50 rounded-full overflow-hidden">
-                          <motion.div 
-                            className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
-                            style={{ width: `${(audioRef?.currentTime || 0) / (audioRef?.duration || 1) * 100}%` }}
-                          />
-                        </div>
+                      <div className="w-full h-1 bg-green-100 dark:bg-green-900/50 overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                          style={{ width: `${(audioRef?.currentTime || 0) / (audioRef?.duration || 1) * 100}%` }}
+                        />
                       </div>
 
                       <div className="flex items-center gap-4 p-4">
@@ -714,6 +709,30 @@ export default function QuranPlayer() {
                               <X className="h-4 w-4" />
                             </Button>
                           </motion.div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 px-6 pb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-2 bg-green-100 dark:bg-green-900/50 rounded-full overflow-hidden">
+                            <motion.div 
+                              className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                              style={{ width: `${surahProgress}%` }}
+                              transition={{ duration: 0.1 }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            {Math.round(surahProgress)}%
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between mt-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            Verse {currentAyahIndex + 1} of {currentAyahs.length}
+                          </span>
+                          <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                            {currentSurah?.englishName}
+                          </span>
                         </div>
                       </div>
                     </Card>

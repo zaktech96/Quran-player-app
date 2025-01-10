@@ -24,10 +24,10 @@
   - Added verse progress indicators
 
 ### 🔧 Technical Updates
-- Implemented verse timing synchronization
-  - Added API integration for verse timings
-  - Added progress tracking system
-  - Improved audio state management
+- Retained progress tracking functionality
+  - Kept audio progress calculation
+  - Maintained verse progress display
+  - Ensured progress bar updates correctly
 - Enhanced error handling for audio playback
 - Added loading states for better UX
 - Identified boilerplate structure mismatch
