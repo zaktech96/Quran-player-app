@@ -45,8 +45,7 @@ export const VideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         onTimeUpdate?.(currentTime);
 
         // Find the current verse based on timestamps
-        const currentVerse = timestamps
-          .slice()
+        const currentVerse = timestamps?.slice()
           .reverse()
           .find(t => currentTime >= t.time);
 
