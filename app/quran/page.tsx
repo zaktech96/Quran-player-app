@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { getAllSurahs, getSurah } from "@/lib/quran"
 import { Surah, Ayah, Reciter } from "@/types/quran"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
 
@@ -50,6 +50,8 @@ export default function QuranPlayer() {
   const [quranData, setQuranData] = useState<AlQuranResponse['data'] | null>(null)
   const [audioSegments, setAudioSegments] = useState<{ start: number; end: number; verseIndex: number }[]>([])
   const [verseDuration, setVerseDuration] = useState<number>(0);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchReciters = async () => {
@@ -150,31 +152,47 @@ export default function QuranPlayer() {
   }, [isContinuousPlay, currentAyahs.length]);
 
   const getAudioUrl = (reciterId: number, verseKey: string) => {
-    // Using everyayah.com API which provides direct MP3 files
+    // Convert reciterId to string and pad with zeros if needed
+    const reciterIdStr = reciterId.toString().padStart(3, '0');
     const [surahNumber, ayahNumber] = verseKey.split(':');
     const paddedSurah = surahNumber.padStart(3, '0');
     const paddedAyah = ayahNumber.padStart(3, '0');
-    return `https://everyayah.com/data/${reciterId}/${paddedSurah}${paddedAyah}.mp3`;
+    
+    // Using everyayah.com API format
+    return `https://everyayah.com/data/Abdul_Basit_Murattal_64kbps/${paddedSurah}${paddedAyah}.mp3`;
   };
 
   const handleVerseClick = async (ayah: Ayah, index: number) => {
     setCurrentAyahIndex(index);
     if (audioRef && selectedReciter !== null && currentSurah) {
       try {
+        setIsLoadingAudio(true);
         const verseKey = `${currentSurah.number}:${ayah.numberInSurah}`;
         const audioUrl = getAudioUrl(selectedReciter, verseKey);
+        
+        const response = await fetch(audioUrl, { method: 'HEAD' });
+        if (!response.ok) {
+          throw new Error('Audio file not found');
+        }
+
         audioRef.src = audioUrl;
         await audioRef.load();
-        await audioRef.play();
-        setIsPlaying(true);
+        const playPromise = audioRef.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          setIsPlaying(true);
+        }
         
-        // Scroll to the clicked verse
         document.getElementById(`verse-${ayah.numberInSurah}`)?.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
       } catch (error) {
         console.error('Error playing verse audio:', error);
+        alert('Unable to play audio. Please try a different reciter or verse.');
+        setIsPlaying(false);
+      } finally {
+        setIsLoadingAudio(false);
       }
     }
   };
@@ -231,14 +249,28 @@ export default function QuranPlayer() {
   const playAudio = async () => {
     if (audioRef && currentSurah && selectedReciter !== null) {
       try {
+        setIsLoadingAudio(true);
         const verseKey = `${currentSurah.number}:${currentAyahs[currentAyahIndex].numberInSurah}`;
         const audioUrl = getAudioUrl(selectedReciter, verseKey);
+        
+        const response = await fetch(audioUrl, { method: 'HEAD' });
+        if (!response.ok) {
+          throw new Error('Audio file not found');
+        }
+
         audioRef.src = audioUrl;
         await audioRef.load();
-        await audioRef.play();
-        setIsPlaying(true);
+        const playPromise = audioRef.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          setIsPlaying(true);
+        }
       } catch (error) {
         console.error('Error playing audio:', error);
+        alert('Unable to play audio. Please try a different reciter or verse.');
+        setIsPlaying(false);
+      } finally {
+        setIsLoadingAudio(false);
       }
     }
   };
@@ -326,6 +358,15 @@ export default function QuranPlayer() {
     }
   };
 
+  const filteredSurahs = useMemo(() => {
+    return surahs.filter(surah => 
+      surah.englishName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      surah.englishNameTranslation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      surah.name.includes(searchQuery) ||
+      surah.number.toString().includes(searchQuery)
+    );
+  }, [surahs, searchQuery]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FCFCFC] to-green-50/30 dark:from-gray-950 dark:to-green-950/30">
       {/* Enhanced Background Effects */}
@@ -358,23 +399,49 @@ export default function QuranPlayer() {
             className="lg:col-span-4"
           >
             <Card className="p-6 md:p-8 shadow-lg border border-green-100/20 dark:border-green-800/20 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-3xl hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col gap-4 mb-6">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 dark:from-green-200 dark:to-green-400 text-transparent bg-clip-text">
                   Surahs
                 </h2>
+                
+                {/* Search Input */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search surah..."
+                    className="w-full px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-green-100 dark:border-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
+                  />
+                  <svg
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+
                 {currentSurah && (
                   <motion.span 
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-100/80 to-emerald-100/80 dark:from-green-900/80 dark:to-emerald-900/80 text-sm font-medium text-green-800 dark:text-green-200"
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-green-100/80 to-emerald-100/80 dark:from-green-900/80 dark:to-emerald-900/80 text-sm font-medium text-green-800 dark:text-green-200 text-center"
                   >
-                    {surahs.length} Chapters
+                    {filteredSurahs.length} of {surahs.length} Chapters
                   </motion.span>
                 )}
               </div>
+
               <ScrollArea className="h-[75vh] pr-4">
                 <div className="space-y-2">
-                  {surahs.map((surah, index) => (
+                  {filteredSurahs.map((surah, index) => (
                     <motion.div
                       key={surah.number}
                       initial={{ opacity: 0, x: -20 }}
@@ -405,6 +472,12 @@ export default function QuranPlayer() {
                       </Button>
                     </motion.div>
                   ))}
+                  
+                  {filteredSurahs.length === 0 && (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 dark:text-gray-400">No surahs found</p>
+                    </div>
+                  )}
                 </div>
               </ScrollArea>
             </Card>
@@ -691,20 +764,25 @@ export default function QuranPlayer() {
                               <Button 
                                 size="icon" 
                                 onClick={playAudio}
+                                disabled={isLoadingAudio}
                                 className="w-16 h-16 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 dark:from-green-500 dark:to-emerald-500 dark:hover:from-green-600 dark:hover:to-emerald-600 transition-all duration-200 shadow-lg"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="h-8 w-8"
-                                >
-                                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
+                                {isLoadingAudio ? (
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                                ) : (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="h-8 w-8"
+                                  >
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                  </svg>
+                                )}
                               </Button>
                             )}
                           </motion.div>
