@@ -428,13 +428,13 @@ export default function QuranPlayer() {
                   </svg>
                 </div>
 
-                {currentSurah && (
+                {searchQuery && (
                   <motion.span 
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     className="px-4 py-2 rounded-full bg-gradient-to-r from-green-100/80 to-emerald-100/80 dark:from-green-900/80 dark:to-emerald-900/80 text-sm font-medium text-green-800 dark:text-green-200 text-center"
                   >
-                    {filteredSurahs.length} of {surahs.length} Chapters
+                    {filteredSurahs.length} matches found
                   </motion.span>
                 )}
               </div>
