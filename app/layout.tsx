@@ -12,13 +12,13 @@ import { validateConfig } from '@/lib/config-validator';
 validateConfig();
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://titan.codeandcreed.tech'),
+  metadataBase: new URL('https://quransphere.vercel.app/'),
   title: {
-    default: 'Titan - Boilerplate',
-    template: `%s | Boilerplate`,
+    default: 'QuranSphere - Quran',
+    template: `%s | QuranSphere`,
   },
   description:
-    'Kickstart your next project with minimal friction - so you can focus on building cool stuff',
+    'Experience the Holy Quran with beautiful recitations, precise translations, and a modern reading experience',
   icons: [
     { rel: 'icon', url: '/favicon.ico' },
     { rel: 'icon', url: '/favicon.png', type: 'image/png' },
@@ -26,19 +26,19 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     description:
-      'Kickstart your next project with minimal friction - so you can focus on building cool stuff',
+      'Experience the Holy Quran with beautiful recitations, precise translations, and a modern reading experience',
     images: ['https://utfs.io/f/8a428f85-ae83-4ca7-9237-6f8b65411293-eun6ii.png'],
-    url: 'titan.codeandcreed.tech',
+    url: 'quransphere.vercel.app',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Titan Boilerplate',
+    title: 'QuranSphere',
     description:
-      'Kickstart your next project with minimal friction - so you can focus on building cool stuff',
+      'Experience the Holy Quran with beautiful recitations, precise translations, and a modern reading experience',
     siteId: '',
-    creator: '@_7obaid_',
+    creator: '@',
     creatorId: '',
-    images: ['https://utfs.io/f/8a428f85-ae83-4ca7-9237-6f8b65411293-eun6ii.png'],
+    images: ['https://5rksqya622.ufs.sh/f/e1JG3uPHb3Vpnp34HNM5xpuneylMqZ0gNT47bY6X8fBCSGwk'],
   },
 };
 
