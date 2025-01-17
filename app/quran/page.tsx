@@ -92,7 +92,7 @@ export default function QuranPlayer() {
     const fetchQuranData = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch("http://api.alquran.cloud/v1/quran/quran-uthmani")
+        const response = await fetch("https://api.alquran.cloud/v1/quran/quran-uthmani")
         const data: AlQuranResponse = await response.json()
 
         if (data.status === "OK" && data.data) {
@@ -161,7 +161,7 @@ export default function QuranPlayer() {
         if (selectedSurah) {
           // Fetch translations
           const translationResponse = await fetch(
-            `http://api.alquran.cloud/v1/surah/${surah.number}/en.sahih`
+            `https://api.alquran.cloud/v1/surah/${surah.number}/en.sahih`
           );
           const translationData = await translationResponse.json();
 
