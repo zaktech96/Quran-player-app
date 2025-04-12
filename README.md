@@ -1,90 +1,23 @@
 # 📖 Quran Player
 
-A modern, feature-rich web application for listening to and studying the Quran. Built with NextJS, this app provides a seamless experience for accessing Quranic recitations, translations, and study tools.
+A modern, elegant web application for listening to and studying the Quran. Built with NextJS, this app provides a seamless experience for accessing Quranic recitations, translations, and study tools. Whether you're a student of the Quran, a regular listener, or someone looking to connect with the divine words, Quran Player offers a beautiful and intuitive interface for your spiritual journey.
 
-## ✨ Features
+## ✨ Key Features
 
-- 🎧 **Audio Player** - High-quality Quran recitations with playback controls
-- 📚 **Multiple Reciters** - Access to various renowned reciters
-- 🌐 **Translations** - Multiple language translations with synchronized text
-- 📱 **Responsive Design** - Works seamlessly across all devices
-- 🔍 **Search Functionality** - Quick access to specific surahs and verses
-- 💾 **Offline Support** - Download recitations for offline listening
-- 📊 **Progress Tracking** - Track your listening progress and bookmarks
-- 🔐 **User Accounts** - Save preferences and sync across devices
+- 🎧 **High-Quality Audio** - Crystal clear recitations from renowned reciters
+- 📚 **Comprehensive Content** - Access to multiple translations and tafsirs
+- 🔍 **Smart Search** - Find specific verses or topics instantly
+- 💾 **Offline Mode** - Download your favorite recitations for offline listening
+- 📱 **Cross-Platform** - Seamless experience across all devices
+- 🔐 **Personalized Experience** - Save bookmarks, track progress, and sync across devices
 
-## ⚡️ Tech Stack
+## 🎯 Why Quran Player?
 
-- **[NextJS 15](https://nextjs.org/)** - Full-Stack React framework
-- **[Supabase](https://supabase.com/)** - Database for user data and preferences
-- **[Clerk](https://clerk.com/)** - User authentication and management
-- **[Tailwind CSS](https://tailwindcss.com/)** - Modern styling framework
-- **[Vercel](https://vercel.com/)** - Deployment and hosting
-
-## 🛠 Quick Setup
-
-1. **Clone and Open**
-```bash
-git clone <repository-url> <your-project-name>
-code -r <your-project-name>
-```
-
-2. **Set Up Git**
-```bash
-git remote remove origin
-git remote add origin <your-new-repository-url>
-git branch -M main
-git push -u origin main
-```
-
-3. **Install Dependencies**
-```bash
-nvm use
-pnpm i
-```
-
-4. **Local Development**
-```bash
-pnpm dev
-```
-
-## 🔑 Environment Setup
-
-### Prerequisites
-- Node.js and pnpm
-- Supabase account for database
-- Clerk account for authentication
-
-### Required Services Setup
-1. **Supabase**
-   - Create database
-   - Get connection strings from Dashboard > Connect
-
-2. **Clerk**
-   - Set up application
-   - Get API keys
-
-### Environment Variables
-Create `.env` file:
-
-```env
-# Database (Required)
-SUPABASE_URL=
-SUPABASE_SERVICE_KEY=
-
-# Auth (Required)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
-```
-
-### Database Setup
-```bash
-pnpm prisma migrate dev --name add-initial-tables
-```
+- **Beautiful Design** - Modern, clean interface that enhances your listening experience
+- **Easy Navigation** - Intuitive controls and organized content structure
+- **Rich Features** - Everything you need for Quran study in one place
+- **Regular Updates** - New reciters and features added frequently
+- **Privacy Focused** - Your data stays secure and private
 
 ## 🚀 Getting Started
 
@@ -141,16 +74,6 @@ quran-player/
    ```bash
    pnpm prisma db push
    ```
-
-## 🔄 Database Migrations
-
-```bash
-# Create migration
-pnpm prisma migrate dev --name <migration-name>
-
-# Push to production
-pnpm prisma db push
-```
 
 ## 🔒 Security Best Practices
 
