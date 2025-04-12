@@ -1,158 +1,180 @@
-# Titan
+# 📖 Quran Player
 
-Easy-to-setup, fully-featured, and customizable NextJS Boilerplate.
+A modern, feature-rich web application for listening to and studying the Quran. Built with NextJS, this app provides a seamless experience for accessing Quranic recitations, translations, and study tools.
 
-## Tech Stack
+## ✨ Features
 
-- [NextJS 15](https://nextjs.org/) - Full-Stack React framework
-- [Supabase](https://supabase.com/) - Database
-- [Clerk](https://clerk.com/) - Authenticate your Users
-- [Stripe](https://stripe.com/) - Collect Payments
-- [Plunk](https://useplunk.com/) - Send Emails
-- [Umami](https://umami.is/) - Analyze User Behavior
-- [Vercel](https://vercel.com/) - Deployments
+- 🎧 **Audio Player** - High-quality Quran recitations with playback controls
+- 📚 **Multiple Reciters** - Access to various renowned reciters
+- 🌐 **Translations** - Multiple language translations with synchronized text
+- 📱 **Responsive Design** - Works seamlessly across all devices
+- 🔍 **Search Functionality** - Quick access to specific surahs and verses
+- 💾 **Offline Support** - Download recitations for offline listening
+- 📊 **Progress Tracking** - Track your listening progress and bookmarks
+- 🔐 **User Accounts** - Save preferences and sync across devices
 
-## Quick Local Setup
+## ⚡️ Tech Stack
 
-1. Clone the repository locally and open in Cursor:
-   ```
-   git clone <repository-url> <your-project-name>
-   code -r <your-project-name>
-   ```
+- **[NextJS 15](https://nextjs.org/)** - Full-Stack React framework
+- **[Supabase](https://supabase.com/)** - Database for user data and preferences
+- **[Clerk](https://clerk.com/)** - User authentication and management
+- **[Tailwind CSS](https://tailwindcss.com/)** - Modern styling framework
+- **[Vercel](https://vercel.com/)** - Deployment and hosting
 
-2. In your terminal inside Cursor, run the following commands to set up your own git repository:
-   ```
-   git remote remove origin
-   git remote add origin <your-new-repository-url>
-   git branch -M main
-   git push -u origin main
-   ```
+## 🛠 Quick Setup
 
-3. Set Node Version:
-   ```
-   nvm use
-   ```
-
-4. Install Dependencies:
-   ```
-   pnpm i
-   ```
-
-5. Start the development server:
-   ```
-   pnpm dev
-   ```
-
-6. Set up ngrok for local development:
-   ```
-   brew install ngrok  # on macOS
-   ngrok http 3000
-   ```
-   Open your browser and navigate to your ngrok URL (e.g. `https://abc123.ngrok.io`) to see your application running :raised_hands:
-
-
-## Setup Environment Variables
-- Node.js and pnpm installed (See https://blueprint.codeandcreed.tech/pre-requisites)
-- Accounts and API keys for:
-  - [Supabase](https://supabase.com/)
-
-```
-Important: When creating your database password, avoid special characters like # and & as they cause URL encoding issues. Find your connection strings in Supabase Dashboard under Connect > App Frameworks/ORMs
+1. **Clone and Open**
+```bash
+git clone <repository-url> <your-project-name>
+code -r <your-project-name>
 ```
 
-  - [Stripe](https://stripe.com/) - if payments.enabled is true
-
-``````
-- Install Stripe CLI and run:
+2. **Set Up Git**
+```bash
+git remote remove origin
+git remote add origin <your-new-repository-url>
+git branch -M main
+git push -u origin main
 ```
-stripe listen --forward-to <your-ngrok-url>/api/payments/webhook
+
+3. **Install Dependencies**
+```bash
+nvm use
+pnpm i
 ```
-``````
 
-  - [Clerk](https://clerk.com/) - if auth.enabled is true
-  - [Plunk](https://useplunk.com/) - if email.enabled is true
+4. **Local Development**
+```bash
+pnpm dev
+```
 
-1. Copy over the `.env.example` file to `.env` and fill in the values from your accounts above:
-   Create a `.env` file in the root directory with the following variables (add only the ones you need based on enabled features):
-   ```
-   # Required for Supabase
-   SUPABASE_URL=<your-supabase-project-url>
-   SUPABASE_SERVICE_KEY=<your-supabase-service-key>
+## 🔑 Environment Setup
 
-   # Required if payments.enabled is true
-   STRIPE_SECRET_KEY=<your-stripe-secret-key>
-   NEXT_PUBLIC_STRIPE_PUBLIC_KEY=<your-stripe-public-key>
-   NEXT_PUBLIC_STRIPE_PRICE_ID=<your-stripe-price-id>
+### Prerequisites
+- Node.js and pnpm
+- Supabase account for database
+- Clerk account for authentication
 
-   # Required if auth.enabled is true
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your-clerk-publishable-key>
-   CLERK_SECRET_KEY=<your-clerk-secret-key>
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+### Required Services Setup
+1. **Supabase**
+   - Create database
+   - Get connection strings from Dashboard > Connect
 
-   # Required if email.enabled is true
-   PLUNK_API_KEY=<your-plunk-api-key>
-   ```
+2. **Clerk**
+   - Set up application
+   - Get API keys
 
-2. Enable features once you have your accounts and API keys:
-   In `config.ts`, set the desired features. The app will validate that you have the required environment variables for each enabled feature:
-   ```typescript
-   const config = {
-     auth: {
-       enabled: true, // Requires Clerk API keys
-     },
-     payments: {
-       enabled: true, // Requires Stripe API keys
-     },
-     email: {
-       enabled: true, // Requires Plunk API key
-     }
-   };
-   ```
+### Environment Variables
+Create `.env` file:
 
-3. Run your first database migration to create the initial tables in Supabase:
-   ```
-   pnpm prisma migrate dev --name add-initial-tables
-   ```
+```env
+# Database (Required)
+SUPABASE_URL=
+SUPABASE_SERVICE_KEY=
 
-## Deployment
+# Auth (Required)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+```
 
-Deploy the first working version of your app to Vercel:
+### Database Setup
+```bash
+pnpm prisma migrate dev --name add-initial-tables
+```
 
-Copy over the production env vars and set them in Vercel when deploying.
+## 🚀 Getting Started
 
-You're now ready to start customizing the landing page, dashboard, and other components as needed - See [Landing Page Design](https://blueprint.codeandcreed.tech/product-development/landing-page)
+1. **Clone the repository**
+2. **Set up your environment variables**
+3. **Run database migrations**
+4. **Start development server**
 
-See our [MVP Development Guide](https://blueprint.codeandcreed.tech/company-building/mvp-development)
+### Project Structure
 
-## Future Database Migrations
+```
+quran-player/
+├── app/                 # Next.js app directory
+│   ├── api/            # API routes
+│   ├── (auth)/         # Authentication routes
+│   └── (player)/       # Player and Quran content routes
+├── components/         # Reusable components
+│   ├── player/        # Audio player components
+│   ├── surah/         # Surah display components
+│   └── ui/            # UI components
+├── lib/               # Utility functions
+├── prisma/            # Database schema
+└── public/            # Static assets
+```
 
-1) Modify the Prisma schema in `prisma/schema.prisma` when you need to add or change database structure.
+### Key Features
 
-2) Run the following command to create a new database migration:
-   ```
-   pnpm prisma migrate dev --name <your-migration-name>
-   ```
+#### Audio Player
+- Play/pause controls
+- Progress bar
+- Volume control
+- Playback speed adjustment
+- Repeat functionality
 
-3) Push the migration to the remote database:
-   ```
+#### Quran Content
+- Surah list with metadata
+- Verse-by-verse display
+- Multiple translations
+- Reciter selection
+- Bookmarking system
+
+#### User Features
+- Account creation and management
+- Progress tracking
+- Custom playlists
+- Offline downloads
+- Settings synchronization
+
+## 🚀 Deployment
+
+1. Deploy to Vercel
+2. Configure environment variables
+3. Run database migrations:
+   ```bash
    pnpm prisma db push
    ```
 
-## Important Security Notes
+## 🔄 Database Migrations
 
-- Enable Row Level Security (RLS) in your Supabase project to ensure data protection at the database level.
-- Always make Supabase calls on the server-side (in API routes or server components) to keep your service key secure.
+```bash
+# Create migration
+pnpm prisma migrate dev --name <migration-name>
 
-## Learn More
+# Push to production
+pnpm prisma db push
+```
 
-Refer to the documentation of the individual technologies used in this project for more detailed information:
-- [NextJS Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Supabase Documentation](https://supabase.io/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [Clerk Documentation](https://clerk.dev/docs)
-- [Stripe Documentation](https://stripe.com/docs)
-- [Plunk Documentation](https://docs.useplunk.com/)
+## 🔒 Security Best Practices
+
+- Enable Row Level Security (RLS) in Supabase
+- Keep service keys secure
+- Use server-side Supabase calls
+- Implement proper authentication checks
+
+## 📚 Documentation
+
+- [NextJS](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Supabase](https://supabase.com/docs)
+- [Prisma](https://www.prisma.io/docs)
+- [Clerk](https://clerk.com/docs)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
