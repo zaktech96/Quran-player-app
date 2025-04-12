@@ -5,18 +5,15 @@ A modern, elegant web application for listening to and studying the Quran. Built
 ## ✨ Key Features
 
 - 🎧 **High-Quality Audio** - Crystal clear recitations from renowned reciters
-- 📚 **Comprehensive Content** - Access to multiple translations and tafsirs
+- 📚 **Comprehensive Content** - Access to multiple translations
 - 🔍 **Smart Search** - Find specific verses or topics instantly
-- 💾 **Offline Mode** - Download your favorite recitations for offline listening
 - 📱 **Cross-Platform** - Seamless experience across all devices
-- 🔐 **Personalized Experience** - Save bookmarks, track progress, and sync across devices
 
 ## 🎯 Why Quran Player?
 
 - **Beautiful Design** - Modern, clean interface that enhances your listening experience
 - **Easy Navigation** - Intuitive controls and organized content structure
 - **Rich Features** - Everything you need for Quran study in one place
-- **Regular Updates** - New reciters and features added frequently
 - **Privacy Focused** - Your data stays secure and private
 
 ## 🚀 Getting Started
@@ -50,21 +47,12 @@ quran-player/
 - Progress bar
 - Volume control
 - Playback speed adjustment
-- Repeat functionality
 
 #### Quran Content
 - Surah list with metadata
 - Verse-by-verse display
 - Multiple translations
 - Reciter selection
-- Bookmarking system
-
-#### User Features
-- Account creation and management
-- Progress tracking
-- Custom playlists
-- Offline downloads
-- Settings synchronization
 
 ## 🚀 Deployment
 
